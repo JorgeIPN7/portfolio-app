@@ -20,3 +20,5 @@ AGENTS.md
 # desde su repo de origen. Formatearlas produce un diff contra ese origen que
 # el siguiente `update` pisaría.
 .claude/skills/
+# La skill orquestadora es nuestra, sí se formatea.
+!.claude/skills/design-workflow/
