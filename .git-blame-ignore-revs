@@ -1,0 +1,13 @@
+# Commits que solo mueven bytes, nunca comportamiento. `git blame` los salta.
+#
+# GitHub lee este archivo solo. En local hay que decirselo a git una vez por
+# clon:
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# Solo entran aqui commits verificados como formato puro. Nunca uno que ademas
+# cambie una linea de logica: git blame mentiria y nadie se daria cuenta.
+# El SHA debe ir completo, de 40 caracteres: uno abreviado hace fallar a blame.
+
+# style: aplica prettier y ordena las clases de Tailwind en todo el repo
+4c78c39781540e2a48620d107608f01868013f87
