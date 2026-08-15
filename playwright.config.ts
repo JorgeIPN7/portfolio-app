@@ -15,6 +15,11 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
+    // Playwright arranca en `en-US`, y el proxy de next-intl negocia el idioma
+    // con `accept-language`: sin fijar esto, cada `page.goto("/")` acabaría en
+    // la versión inglesa. Las pruebas que sí quieren negociación se crean su
+    // propio contexto con otro `locale`.
+    locale: "es-MX",
   },
   projects: [
     {

@@ -1,9 +1,15 @@
-import Link from "next/link";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { publishedProjects } from "@/data/projects";
-import { resumeData } from "@/data/resume-data";
+import { getResumeData } from "@/data/resume-data";
+import { routing } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { GithubIcon, LinkedinIcon } from "@/components/icons/brand-icons";
+import { ContactForm } from "@/components/contact-form";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { ProfileVideo } from "@/components/profile-video";
 import { Reveal } from "@/components/reveal";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -27,13 +33,17 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+/**
+ * Los iconos viven aquí y el texto en `messages/`: la clave es lo que une a los
+ * dos. Así traducir un principio no obliga a tocar este archivo.
+ */
 const principles = [
-  { Icon: Brain, text: "Controla tus pensamientos antes que tus actos" },
-  { Icon: Eye, text: "Cumple tus promesas, aunque nadie mire" },
-  { Icon: Dumbbell, text: "Entrena la mente como entrenas el cuerpo" },
-  { Icon: Zap, text: "Aprende a comenzar aunque no tengas ganas" },
-  { Icon: TrendingUp, text: "Termina lo que empiezas, aunque duela" },
-];
+  { key: "thoughts", Icon: Brain },
+  { key: "promises", Icon: Eye },
+  { key: "train", Icon: Dumbbell },
+  { key: "start", Icon: Zap },
+  { key: "finish", Icon: TrendingUp },
+] as const;
 
 function SectionHeading({ title }: { title: string }) {
   return (
@@ -73,8 +83,17 @@ function SkillCategory({
   );
 }
 
-export default function Home() {
-  const data = resumeData;
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  setRequestLocale(locale);
+
+  const t = await getTranslations();
+  const data = getResumeData(locale);
 
   // Datos estructurados para buscadores y asistentes. Se escapa `<` según
   // recomienda la guía de JSON-LD de Next.
@@ -112,12 +131,13 @@ export default function Home() {
 
       {/* Acciones fijas, arriba a la derecha */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+        <LanguageSwitcher />
         <ThemeToggle />
         <a
           href={cvPdfPath}
           download
           className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 text-muted-foreground backdrop-blur transition-colors hover:bg-accent"
-          aria-label="Descargar CV en PDF"
+          aria-label={t("actions.downloadCv")}
         >
           <Download size={18} aria-hidden="true" />
         </a>
@@ -128,7 +148,7 @@ export default function Home() {
           <ProfileVideo poster={profileDarkImagePath} />
 
           <div className="w-full">
-            <SectionHeading title="contacto" />
+            <SectionHeading title={t("sections.contact")} />
             <div className="flex flex-col gap-3">
               <a
                 href={`mailto:${data.contact.email}`}
@@ -176,14 +196,14 @@ export default function Home() {
 
           <div className="w-full rounded-lg border border-border bg-background/50 px-3 py-2">
             <ul className="flex flex-col gap-1 text-xs leading-snug text-muted-foreground">
-              {principles.map(({ Icon, text }) => (
-                <li key={text} className="flex items-center gap-1.5">
+              {principles.map(({ key, Icon }) => (
+                <li key={key} className="flex items-center gap-1.5">
                   <Icon
                     size={12}
                     className="shrink-0 text-foreground"
                     aria-hidden="true"
                   />
-                  <span>{text}</span>
+                  <span>{t(`principles.${key}`)}</span>
                 </li>
               ))}
             </ul>
@@ -198,7 +218,7 @@ export default function Home() {
               href="/proyectos"
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
-              Ver proyectos
+              {t("actions.viewProjects")}
               <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
           )}
@@ -221,7 +241,7 @@ export default function Home() {
 
           <Reveal>
             <section className="mb-10">
-              <SectionHeading title="perfil profesional" />
+              <SectionHeading title={t("sections.profile")} />
               <p className="text-base leading-relaxed text-foreground">
                 {data.profile}
               </p>
@@ -230,7 +250,7 @@ export default function Home() {
 
           <Reveal>
             <section className="mb-10">
-              <SectionHeading title="experiencia profesional" />
+              <SectionHeading title={t("sections.experience")} />
               <div className="flex flex-col gap-8">
                 {data.experience.map((exp) => (
                   <div key={`${exp.company}-${exp.period}`}>
@@ -267,7 +287,7 @@ export default function Home() {
 
           <Reveal>
             <section className="mb-10">
-              <SectionHeading title="formación académica" />
+              <SectionHeading title={t("sections.education")} />
               <div className="flex flex-col gap-5">
                 {data.education.map((edu) => (
                   <div key={`${edu.degree}-${edu.institution}`}>
@@ -290,7 +310,7 @@ export default function Home() {
 
           <Reveal>
             <section className="mb-10">
-              <SectionHeading title="desarrollo profesional continuo" />
+              <SectionHeading title={t("sections.continuousLearning")} />
               <p className="text-base leading-relaxed text-foreground">
                 {data.continuousLearning}
               </p>
@@ -299,7 +319,7 @@ export default function Home() {
 
           <Reveal>
             <section className="mb-10">
-              <SectionHeading title="habilidades técnicas" />
+              <SectionHeading title={t("sections.technicalSkills")} />
               {Object.entries(data.technicalSkills).map(([cat, skills]) => (
                 <SkillCategory key={cat} category={cat} skills={skills} />
               ))}
@@ -308,7 +328,7 @@ export default function Home() {
 
           <Reveal>
             <section className="mb-10">
-              <SectionHeading title="habilidades blandas" />
+              <SectionHeading title={t("sections.softSkills")} />
               {Object.entries(data.softSkills).map(([cat, skills]) => (
                 <SkillCategory key={cat} category={cat} skills={skills} />
               ))}
@@ -317,7 +337,7 @@ export default function Home() {
 
           <Reveal>
             <section className="mb-10">
-              <SectionHeading title="idiomas" />
+              <SectionHeading title={t("sections.languages")} />
               <div className="grid grid-cols-2 gap-6">
                 {data.languages.map((lang) => (
                   <div key={lang.language}>
@@ -335,15 +355,22 @@ export default function Home() {
 
           <Reveal>
             <section className="mb-10">
-              <SectionHeading title="intereses" />
+              <SectionHeading title={t("sections.interests")} />
               <p className="text-sm text-muted-foreground">{data.hobbies}</p>
+            </section>
+          </Reveal>
+
+          <Reveal>
+            <section id="contacto" className="mb-10 scroll-mt-8">
+              <SectionHeading title={t("sections.writeToMe")} />
+              <ContactForm fallbackEmail={data.contact.email} locale={locale} />
             </section>
           </Reveal>
 
           <footer className="mt-12 border-t border-border pt-6 text-center text-xs text-muted-foreground">
             <p>{data.footer.privacyNotice}</p>
             <p className="mt-2">
-              Última actualización: {data.footer.lastUpdated}
+              {t("footer.lastUpdated", { date: data.footer.lastUpdated })}
             </p>
           </footer>
         </main>

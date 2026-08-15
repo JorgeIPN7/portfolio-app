@@ -87,6 +87,22 @@
       description: "Corredores, entorno DOM y utilidades de prueba. Van juntas porque se rompen entre si: @vitejs/plugin-react 6 exige vite ^8, y vitest arrastra su propia version de vite. Playwright fija version exacta porque su binario de navegador se instala aparte con 'pnpm exec playwright install'.",
     },
 
+    {
+      groupName: "Datos y formularios",
+      matchPackageNames: [
+        "zod",
+        "@t3-oss/env-nextjs",
+        "next-safe-action",
+        "resend",
+      ],
+      description: "Validacion, entorno tipado, Server Actions y envio de correo. Van juntas porque zod es la base de las otras dos: t3-oss y next-safe-action lo consumen via Standard Schema, y un major de zod las arrastra. next-safe-action 8 ya no necesita adaptador de validacion. El formulario de contacto esta cubierto por e2e.",
+    },
+    {
+      groupName: "Internacionalizacion",
+      matchPackageNames: ["next-intl", "use-intl"],
+      description: "next-intl y su nucleo use-intl se publican con la misma version y hay que moverlos a la vez. Arrastra @swc/core y @parcel/watcher, cuyos scripts de instalacion estan desactivados en pnpm-workspace.yaml porque hay binario precompilado: si un major cambia eso, el arranque falla. El enrutado /es y /en esta cubierto por e2e.",
+    },
+
     // ---- Techos de versión verificados el 15-ago-2026 ----
     // No son preferencias: cada uno se probó instalándolo y rompió.
     // Al levantar un techo, borrar la regla y correr build + lint + typecheck.

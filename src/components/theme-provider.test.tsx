@@ -1,14 +1,25 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { routing } from "@/i18n/routing";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
+import messages from "../../messages/es.json";
 
+/**
+ * El proveedor de idioma es obligatorio desde que la etiqueta accesible del
+ * botón sale del catálogo: sin él, `useTranslations` lanza. Se montan los
+ * mensajes reales y no un doble, para que la prueba falle si alguien renombra
+ * o borra la clave.
+ */
 function renderConProvider() {
   return render(
-    <ThemeProvider>
-      <ThemeToggle />
-    </ThemeProvider>,
+    <NextIntlClientProvider locale={routing.defaultLocale} messages={messages}>
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>
+    </NextIntlClientProvider>,
   );
 }
 

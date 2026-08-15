@@ -1,10 +1,26 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { resumeData } from "@/data/resume-data";
+import { resumeIdentity } from "@/data/resume-data";
+import { routing } from "@/i18n/routing";
 import { siteName } from "@/lib/site";
 
-export const alt = `${siteName} — Senior Full-Stack Engineer en fintech, proptech y blockchain`;
+/**
+ * Sin esto la imagen queda como ruta dinámica y se rasteriza en cada petición,
+ * porque el segmento `[locale]` la deja sin valores conocidos. El
+ * `generateStaticParams` del layout no alcanza a los archivos de metadatos.
+ */
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+/**
+ * La imagen no se traduce: lo único que dice, aparte del nombre, es el puesto y
+ * los tres sectores, y esos ya se escriben igual en los dos idiomas. `alt` es
+ * un export estático del convenio de Next, así que tampoco podría variar por
+ * idioma sin convertir esto en `generateImageMetadata`.
+ */
+export const alt = `${siteName} — Senior Full-Stack Engineer (fintech, proptech, blockchain)`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -60,10 +76,10 @@ export default async function Image() {
           }}
         >
           <span style={{ fontSize: 78, color: "#e2e8f0" }}>
-            {resumeData.name}
+            {resumeIdentity.name}
           </span>
           <span style={{ fontSize: 104, color: "#ffffff" }}>
-            {resumeData.lastName}
+            {resumeIdentity.lastName}
           </span>
         </div>
       </div>

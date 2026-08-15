@@ -1,4 +1,13 @@
+# pnpm 11 no ejecuta scripts de instalación sin permiso explícito. Cada entrada
+# se decide a mano: `false` no rompe nada mientras el paquete traiga binario
+# precompilado para la plataforma, que es el caso de los dos primeros.
 allowBuilds:
+  # Los arrastra next-intl. Sus scripts compilan desde fuente solo cuando no hay
+  # binario para la plataforma, y sí lo hay para win32-x64 (desarrollo) y
+  # linux-x64 (Vercel). Si algún día se despliega en una arquitectura sin
+  # precompilado, next-intl fallará al arrancar y habrá que ponerlos en `true`.
+  "@parcel/watcher": false
+  "@swc/core": false
   msw: true
   sharp: true
   unrs-resolver: true

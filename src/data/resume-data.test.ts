@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { resumeData } from "@/data/resume-data";
+import { getResumeData } from "@/data/resume-data";
+import { routing } from "@/i18n/routing";
 
 /**
  * El CV se edita a mano y no hay CMS que valide nada. Estas pruebas cubren lo
  * que el tipo `ResumeData` no puede: que las URLs funcionen, que no queden
- * campos en blanco y que las claves que usa React sigan siendo únicas.
+ * campos en blanco, que las claves que usa React sigan siendo únicas y —desde
+ * que hay dos idiomas— que las dos versiones no se separen.
  */
-describe("resumeData", () => {
+describe.each(routing.locales)("resumeData (%s)", (locale) => {
+  const resumeData = getResumeData(locale);
+
   it("los enlaces de contacto son URLs https válidas", () => {
     const urls = [
       resumeData.contact.linkedin.url,
@@ -70,5 +74,54 @@ describe("resumeData", () => {
     // El idioma es la key de React en esa sección.
     const idiomas = resumeData.languages.map((idioma) => idioma.language);
     expect(new Set(idiomas).size).toBe(idiomas.length);
+  });
+});
+
+/**
+ * Lo que TypeScript no puede vigilar: que la traducción siga siendo una
+ * traducción. Añadir un empleo solo en español compila sin protestar y deja el
+ * CV en inglés incompleto, que es exactamente el fallo que nadie ve hasta que
+ * lo lee un reclutador.
+ */
+describe("las dos versiones del CV no se separan", () => {
+  const es = getResumeData("es");
+  const en = getResumeData("en");
+
+  it("tienen el mismo número de empleos, con los mismos puntos", () => {
+    expect(en.experience).toHaveLength(es.experience.length);
+    es.experience.forEach((experiencia, indice) => {
+      expect(en.experience[indice]!.items).toHaveLength(
+        experiencia.items.length,
+      );
+    });
+  });
+
+  it("tienen la misma formación y los mismos idiomas", () => {
+    expect(en.education).toHaveLength(es.education.length);
+    expect(en.languages).toHaveLength(es.languages.length);
+  });
+
+  it("declaran las mismas categorías de habilidades, con el mismo tamaño", () => {
+    const tecnicasEs = Object.values(es.technicalSkills);
+    const tecnicasEn = Object.values(en.technicalSkills);
+    expect(tecnicasEn).toHaveLength(tecnicasEs.length);
+    tecnicasEs.forEach((habilidades, indice) => {
+      expect(tecnicasEn[indice]).toHaveLength(habilidades.length);
+    });
+
+    const blandasEs = Object.values(es.softSkills);
+    const blandasEn = Object.values(en.softSkills);
+    expect(blandasEn).toHaveLength(blandasEs.length);
+  });
+
+  it("los datos de contacto son idénticos, no traducidos", () => {
+    // Un correo o un teléfono traducidos serían un error, no una versión.
+    expect(en.contact.email).toBe(es.contact.email);
+    expect(en.contact.phone.url).toBe(es.contact.phone.url);
+    expect(en.contact.phone.label).toBe(es.contact.phone.label);
+    expect(en.contact.linkedin.url).toBe(es.contact.linkedin.url);
+    expect(en.contact.github.url).toBe(es.contact.github.url);
+    expect(en.name).toBe(es.name);
+    expect(en.lastName).toBe(es.lastName);
   });
 });

@@ -1,9 +1,15 @@
+// @vitest-environment node
+//
+// El resto de la suite corre en jsdom, pero este módulo lee variables de
+// servidor a través de t3-env, y t3-env decide si está en el cliente mirando
+// `typeof window`. Bajo jsdom hay `window`, así que daría por hecho que es el
+// navegador y lanzaría "Attempted to access a server-side environment variable
+// on the client". `site.ts` es código de servidor y aquí se prueba como tal.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   cvPdfPath,
   profileDarkImagePath,
   profileImagePath,
-  siteDescription,
   siteUrl,
 } from "@/lib/site";
 
@@ -31,11 +37,6 @@ describe("configuración del sitio", () => {
     for (const path of [cvPdfPath, profileImagePath, profileDarkImagePath]) {
       expect(path).toMatch(/^\//);
     }
-  });
-
-  it("la descripción cabe en un resultado de búsqueda", () => {
-    // Google corta alrededor de los 160 caracteres.
-    expect(siteDescription.length).toBeLessThanOrEqual(160);
   });
 });
 
@@ -85,6 +86,10 @@ describe("resolución de la URL del sitio", () => {
         NEXT_PUBLIC_SITE_URL: undefined,
         VERCEL_PROJECT_PRODUCTION_URL: undefined,
         VERCEL: "1",
+        // Dentro de un despliegue el esquema de entorno también exige la clave
+        // de Resend, y saltaría antes que la guarda de la URL. Se le da un
+        // valor para que esta prueba mida solo lo que dice medir.
+        RESEND_API_KEY: "re_test",
       }),
     ).rejects.toThrow(/URL pública del sitio/);
   });
