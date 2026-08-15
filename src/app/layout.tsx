@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider";
 import { resumeData } from "@/data/resume-data";
 import { siteDescription, siteName, siteTitle, siteUrl } from "@/lib/site";
-import { THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
 const montserrat = localFont({
@@ -99,42 +98,33 @@ export const viewport: Viewport = {
   themeColor: "#0b1120",
 };
 
-/**
- * Aplica el tema antes del primer pintado. Sin esto, la clase se pondría en un
- * efecto y el visitante vería un destello antes de que entre el tema correcto.
- * Va inline y sin `async` a propósito: tiene que bloquear el render.
- *
- * El oscuro es el estado por defecto de la página, así que solo un "light"
- * guardado explícitamente lo desactiva. Si localStorage no está disponible,
- * también gana el oscuro.
- *
- * La clave viene de `@/lib/theme`, que no lleva `"use client"`: importarla del
- * proveedor de tema la dejaría en `undefined` aquí, y el build no se quejaría.
- */
-const themeScript = `(function(){try{if(localStorage.getItem(${JSON.stringify(
-  THEME_STORAGE_KEY,
-)})!=="light")document.documentElement.classList.add("dark")}catch(e){document.documentElement.classList.add("dark")}})();`;
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
+    // `suppressHydrationWarning` aquí es requisito de next-themes: su script
+    // añade la clase del tema al <html> antes de que React hidrate.
     <html
       lang="es"
       className={`${montserrat.variable} ${playfairDisplay.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       {/*
         `suppressHydrationWarning` no se hereda: hace falta también aquí porque
         las extensiones del navegador (Bitdefender inyecta `bis_register` y
         `__processed_<uuid>__`) modifican el <body> antes de que React hidrate.
       */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
+        {/*
+          Las secciones del CV se sirven con opacidad 0 y aparecen al entrar en
+          pantalla. Sin JavaScript no hay nada que las muestre, así que aquí se
+          revierte ese estado inicial: el CV entero tiene que poder leerse.
+        */}
+        <noscript>
+          <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
+        </noscript>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

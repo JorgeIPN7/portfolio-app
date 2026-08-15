@@ -1,58 +1,69 @@
 "use client";
 
+import { animate, type AnimationPlaybackControls } from "motion";
+import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef } from "react";
-import { useTheme } from "@/components/theme-provider";
 
-/** Salto por fotograma al rebobinar. Más alto = más rápido y más entrecortado. */
-const REVERSE_STEP_SECONDS = 0.04;
+/**
+ * Cuántas veces más rápido va el rebobinado que la reproducción normal. El
+ * bucle manual que había antes restaba 0,04 s por fotograma a 60 fps, es decir
+ * 2,4x: se conserva esa sensación.
+ */
+const REWIND_SPEED = 3;
+
+/** Margen sobre el final: algunos códecs no tienen fotograma exacto en `duration`. */
+const END_MARGIN = 0.05;
 
 /**
  * Retrato que reacciona al cambio de tema: hacia delante al pasar a oscuro,
  * rebobinado al volver a claro.
  *
- * Sobre el peso: con `preload="auto"` el vídeo competía con la carga de la
- * página, y con `preload="none"` a secas llegaba tarde al primer clic. El
- * elemento arranca sin precarga y el archivo se pide aparte, en cuanto el
- * navegador queda ocioso: fuera de la ruta crítica, pero listo antes de que
- * nadie toque el botón. Si aun así el clic llega primero, se espera a que
- * haya fotogramas en vez de perder la reproducción.
+ * El archivo pesa varios MB. Con `preload="auto"` competía con la carga de la
+ * página y con `preload="none"` a secas llegaba tarde al primer clic, así que
+ * el elemento arranca sin precarga y el vídeo se pide aparte en cuanto el
+ * navegador queda ocioso. Si el clic llega antes, se espera a que haya
+ * fotogramas en vez de perder la reproducción.
  *
- * Sobre `prefers-reduced-motion`: aquí no se consulta a propósito. Esa
- * preferencia existe para el movimiento que aparece sin pedirlo; este vídeo
- * es la respuesta directa a un clic, y saltárselo elimina la función en vez
- * de suavizarla.
+ * `prefers-reduced-motion` no se consulta a propósito: esa preferencia existe
+ * para el movimiento que aparece sin pedirlo, y este vídeo es la respuesta
+ * directa a un clic. Saltárselo eliminaría la función en vez de suavizarla.
  */
 export function ProfileVideo({ poster }: { poster: string }) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const previousThemeRef = useRef(theme);
-  const initialThemeRef = useRef(theme);
-  const rafRef = useRef<number | null>(null);
+  // next-themes no conoce el tema hasta que monta: `undefined` distingue el
+  // primer valor (posición de reposo) de un cambio real (animación).
+  const previousThemeRef = useRef<string | undefined>(undefined);
+  const rewindRef = useRef<AnimationPlaybackControls | null>(null);
 
-  const stopReverse = useCallback(() => {
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
+  const stopRewind = useCallback(() => {
+    rewindRef.current?.stop();
+    rewindRef.current = null;
   }, []);
 
-  const playReverse = useCallback(() => {
+  const rewind = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    stopReverse();
+    stopRewind();
 
-    const step = () => {
-      if (video.currentTime <= REVERSE_STEP_SECONDS) {
-        video.currentTime = 0;
-        rafRef.current = null;
-        return;
-      }
-      video.currentTime = Math.max(0, video.currentTime - REVERSE_STEP_SECONDS);
-      rafRef.current = requestAnimationFrame(step);
-    };
+    const desde = video.currentTime;
+    if (desde <= 0) return;
 
-    rafRef.current = requestAnimationFrame(step);
-  }, [stopReverse]);
+    // La duración se calcula sobre lo que queda por recorrer, no fija: con un
+    // valor constante, rebobinar 5 segundos de vídeo en medio segundo hacía que
+    // el cambio pasara desapercibido. `linear` porque un rebobinado con
+    // aceleración y frenado no se lee como tal.
+    rewindRef.current = animate(desde, 0, {
+      duration: desde / REWIND_SPEED,
+      ease: "linear",
+      onUpdate: (segundo) => {
+        video.currentTime = Math.max(0, segundo);
+      },
+      onComplete: () => {
+        rewindRef.current = null;
+      },
+    });
+  }, [stopRewind]);
 
   // Precarga diferida: la descarga empieza cuando la página ya está servida.
   useEffect(() => {
@@ -81,34 +92,44 @@ export function ProfileVideo({ poster }: { poster: string }) {
     };
   }, []);
 
-  // Posición de reposo al cargar. En oscuro el retrato corresponde al último
-  // fotograma, así que el vídeo se coloca ahí en cuanto hay metadatos; el
-  // póster ya muestra ese mismo fotograma, así que el salto no se ve.
+  // Un solo efecto para las dos cosas, a propósito. Cuando la posición de
+  // reposo vivía en su propio efecto declarado antes que este, React lo
+  // ejecutaba primero en el mismo commit: ponía `currentTime` a 0 justo antes
+  // de que arrancara el rebobinado, que entonces animaba de 0 a 0 y no se veía
+  // nada. Aquí no hay carrera posible.
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || initialThemeRef.current !== "dark") return;
+    if (!video || !resolvedTheme) return;
 
-    const settle = () => {
-      // Si ya hubo un cambio de tema, manda la animación.
-      if (previousThemeRef.current !== initialThemeRef.current) return;
-      if (Number.isFinite(video.duration)) {
-        video.currentTime = Math.max(0, video.duration - 0.05);
+    const anterior = previousThemeRef.current;
+    previousThemeRef.current = resolvedTheme;
+
+    // Primer tema conocido: es la posición de reposo, no una transición. En
+    // oscuro el retrato corresponde al último fotograma; el póster ya muestra
+    // ese mismo fotograma, así que el salto no se ve.
+    if (anterior === undefined) {
+      const settle = () => {
+        // Si mientras cargaban los metadatos ya hubo un cambio de tema, manda
+        // la animación: este colocado llega tarde y hay que descartarlo.
+        if (previousThemeRef.current !== resolvedTheme) return;
+        if (!Number.isFinite(video.duration)) return;
+        video.currentTime =
+          resolvedTheme === "dark"
+            ? Math.max(0, video.duration - END_MARGIN)
+            : 0;
+      };
+
+      if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+        settle();
+        return;
       }
-    };
-
-    if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
-      settle();
+      // Sin cleanup ni `once` a secas: el listener debe sobrevivir a que el
+      // efecto se re-ejecute, y `settle` ya se descarta solo si llega tarde.
+      video.addEventListener("loadedmetadata", settle, { once: true });
       return;
     }
 
-    video.addEventListener("loadedmetadata", settle, { once: true });
-    return () => video.removeEventListener("loadedmetadata", settle);
-  }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || previousThemeRef.current === theme) return;
-    previousThemeRef.current = theme;
+    if (anterior === resolvedTheme) return;
 
     // Si la precarga aún no ha traído nada, se fuerza aquí.
     if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
@@ -117,14 +138,14 @@ export function ProfileVideo({ poster }: { poster: string }) {
     }
 
     const run = () => {
-      if (theme === "dark") {
-        stopReverse();
+      if (resolvedTheme === "dark") {
+        stopRewind();
         video.currentTime = 0;
         // Puede rechazarse por ahorro de batería; el póster se queda.
         void video.play().catch(() => {});
       } else {
         video.pause();
-        playReverse();
+        rewind();
       }
     };
 
@@ -137,10 +158,10 @@ export function ProfileVideo({ poster }: { poster: string }) {
 
     video.addEventListener("canplay", run, { once: true });
     return () => video.removeEventListener("canplay", run);
-  }, [theme, playReverse, stopReverse]);
+  }, [resolvedTheme, rewind, stopRewind]);
 
-  // Corta la animación pendiente al desmontar.
-  useEffect(() => stopReverse, [stopReverse]);
+  // Corta el rebobinado pendiente al desmontar.
+  useEffect(() => stopRewind, [stopRewind]);
 
   return (
     <div className="relative h-56 w-56 overflow-hidden rounded-full border-2 border-border lg:h-64 lg:w-64">

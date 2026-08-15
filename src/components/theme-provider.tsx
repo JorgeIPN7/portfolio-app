@@ -1,61 +1,28 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import { THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
 
-type ThemeContextValue = {
-  theme: Theme;
-  toggleTheme: () => void;
-};
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
-
-function applyTheme(theme: Theme) {
-  document.documentElement.classList.toggle("dark", theme === "dark");
-}
-
-function readAppliedTheme(): Theme {
-  // El script de `layout.tsx` ya dejó la clase puesta antes del primer pintado,
-  // así que el DOM es la fuente de verdad y no hace falta releer localStorage.
-  return document.documentElement.classList.contains("dark") ? "dark" : "light";
-}
-
+/**
+ * Envuelve a next-themes con la configuración de este sitio.
+ *
+ * `defaultTheme="dark"` con `enableSystem={false}`: la página abre siempre en
+ * oscuro y solo una elección explícita guardada la saca de ahí. Es a propósito
+ * distinto del comportamiento habitual de next-themes, que sigue al sistema.
+ *
+ * El script antiparpadeo ya no se escribe a mano en `layout.tsx`: lo inyecta
+ * next-themes antes del primer pintado.
+ */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() =>
-    // El oscuro es el estado por defecto de la página; el script de `layout.tsx`
-    // ya lo dejó aplicado salvo que haya un "light" guardado.
-    typeof document === "undefined" ? "dark" : readAppliedTheme(),
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem={false}
+      storageKey={THEME_STORAGE_KEY}
+      disableTransitionOnChange
+    >
+      {children}
+    </NextThemesProvider>
   );
-
-  const toggleTheme = useCallback(() => {
-    setTheme((current) => {
-      const next: Theme = current === "dark" ? "light" : "dark";
-      applyTheme(next);
-      try {
-        window.localStorage.setItem(THEME_STORAGE_KEY, next);
-      } catch {
-        // Modo privado o almacenamiento bloqueado: el tema sigue funcionando,
-        // solo no sobrevive a la recarga.
-      }
-      return next;
-    });
-  }, []);
-
-  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
-
-  return <ThemeContext value={value}>{children}</ThemeContext>;
-}
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (context === null) {
-    throw new Error("useTheme debe usarse dentro de <ThemeProvider>.");
-  }
-  return context;
 }

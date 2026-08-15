@@ -1,20 +1,13 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ThemeProvider, useTheme } from "@/components/theme-provider";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
-
-/** Expone el valor del contexto para poder afirmarlo. */
-function Sonda() {
-  const { theme } = useTheme();
-  return <span data-testid="tema">{theme}</span>;
-}
 
 function renderConProvider() {
   return render(
     <ThemeProvider>
       <ThemeToggle />
-      <Sonda />
     </ThemeProvider>,
   );
 }
@@ -22,73 +15,70 @@ function renderConProvider() {
 const botonTema = () =>
   screen.getByRole("button", { name: /tema claro y oscuro/i });
 
-describe("ThemeProvider", () => {
+/**
+ * Se prueba el comportamiento, no next-themes. Lo que importa es que la
+ * configuración de este sitio siga cumpliendo lo pedido: abrir en oscuro,
+ * ignorar el esquema del sistema y recordar la elección.
+ */
+describe("tema", () => {
   beforeEach(() => {
     window.localStorage.clear();
-    document.documentElement.classList.remove("dark");
+    document.documentElement.classList.remove("dark", "light");
   });
 
-  it("useTheme falla fuera del provider en vez de devolver un contexto vacío", () => {
-    // React vuelca el error en consola aunque la prueba lo capture.
-    const silencio = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(() => render(<Sonda />)).toThrow(/ThemeProvider/);
-    silencio.mockRestore();
+  it("abre en oscuro cuando no hay nada guardado", async () => {
+    renderConProvider();
+    await waitFor(() => expect(document.documentElement).toHaveClass("dark"));
   });
 
-  it("toma el estado inicial del DOM, que es lo que deja el script antiparpadeo", () => {
-    document.documentElement.classList.add("dark");
-    render(
-      <ThemeProvider>
-        <Sonda />
-      </ThemeProvider>,
+  it("respeta la elección guardada por encima del valor por defecto", async () => {
+    window.localStorage.setItem(THEME_STORAGE_KEY, "light");
+    renderConProvider();
+    await waitFor(() =>
+      expect(document.documentElement).not.toHaveClass("dark"),
     );
-    expect(screen.getByTestId("tema")).toHaveTextContent("dark");
   });
 
-  it("al pulsar pasa a oscuro, aplica la clase y guarda la elección", () => {
+  it("al pulsar pasa a claro y lo guarda", async () => {
     renderConProvider();
-    expect(document.documentElement).not.toHaveClass("dark");
+    await waitFor(() => expect(document.documentElement).toHaveClass("dark"));
 
     fireEvent.click(botonTema());
 
-    expect(screen.getByTestId("tema")).toHaveTextContent("dark");
-    expect(document.documentElement).toHaveClass("dark");
-    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("dark");
+    await waitFor(() => {
+      expect(document.documentElement).not.toHaveClass("dark");
+      expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
+    });
   });
 
-  it("un segundo clic vuelve a claro y también lo guarda", () => {
+  it("un segundo clic vuelve a oscuro", async () => {
     renderConProvider();
-    fireEvent.click(botonTema());
-    fireEvent.click(botonTema());
+    await waitFor(() => expect(document.documentElement).toHaveClass("dark"));
 
-    expect(screen.getByTestId("tema")).toHaveTextContent("light");
-    expect(document.documentElement).not.toHaveClass("dark");
-    // Se guarda "light" explícitamente: sin eso, la recarga volvería al
-    // oscuro por defecto y la elección se perdería.
-    expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
+    fireEvent.click(botonTema());
+    await waitFor(() =>
+      expect(document.documentElement).not.toHaveClass("dark"),
+    );
+
+    fireEvent.click(botonTema());
+    await waitFor(() => {
+      expect(document.documentElement).toHaveClass("dark");
+      expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("dark");
+    });
   });
 
-  it("sigue funcionando si localStorage está bloqueado", () => {
-    const fallo = vi
-      .spyOn(Storage.prototype, "setItem")
-      .mockImplementation(() => {
-        throw new Error("modo privado");
-      });
-
+  it("guarda bajo la clave que comparte con el resto del proyecto", async () => {
     renderConProvider();
-    expect(() => fireEvent.click(botonTema())).not.toThrow();
-    // El tema cambia igual; solo no sobrevive a la recarga.
-    expect(document.documentElement).toHaveClass("dark");
-
-    fallo.mockRestore();
+    fireEvent.click(botonTema());
+    await waitFor(() =>
+      expect(window.localStorage.getItem(THEME_STORAGE_KEY)).not.toBeNull(),
+    );
+    // Si next-themes cambiara de clave por defecto, esto lo detecta.
+    expect(THEME_STORAGE_KEY).toBe("theme");
   });
 });
 
 describe("ThemeToggle", () => {
-  beforeEach(() => {
-    document.documentElement.classList.remove("dark");
-  });
-
   it("tiene un nombre accesible y no anuncia los iconos", () => {
     renderConProvider();
     expect(botonTema()).toBeInTheDocument();

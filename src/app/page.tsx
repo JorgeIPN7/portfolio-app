@@ -1,8 +1,11 @@
+import Link from "next/link";
+import { publishedProjects } from "@/data/projects";
 import { resumeData } from "@/data/resume-data";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { GithubIcon, LinkedinIcon } from "@/components/icons/brand-icons";
 import { ProfileVideo } from "@/components/profile-video";
+import { Reveal } from "@/components/reveal";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   cvPdfPath,
@@ -12,6 +15,7 @@ import {
   siteUrl,
 } from "@/lib/site";
 import {
+  ArrowUpRight,
   Mail,
   MapPin,
   Download,
@@ -184,6 +188,20 @@ export default function Home() {
               ))}
             </ul>
           </div>
+
+          {/*
+            El enlace aparece solo cuando hay algún caso publicado: mientras el
+            índice esté vacío, llevar allí al visitante no aporta nada.
+          */}
+          {publishedProjects.length > 0 && (
+            <Link
+              href="/proyectos"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              Ver proyectos
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+          )}
         </aside>
 
         <main className="flex-1 px-8 py-10 lg:px-14">
@@ -201,108 +219,126 @@ export default function Home() {
             </p>
           </div>
 
-          <section className="mb-10">
-            <SectionHeading title="perfil profesional" />
-            <p className="text-base leading-relaxed text-foreground">
-              {data.profile}
-            </p>
-          </section>
+          <Reveal>
+            <section className="mb-10">
+              <SectionHeading title="perfil profesional" />
+              <p className="text-base leading-relaxed text-foreground">
+                {data.profile}
+              </p>
+            </section>
+          </Reveal>
 
-          <section className="mb-10">
-            <SectionHeading title="experiencia profesional" />
-            <div className="flex flex-col gap-8">
-              {data.experience.map((exp) => (
-                <div key={`${exp.company}-${exp.period}`}>
-                  <h3 className="font-heading text-base font-bold text-foreground">
-                    {exp.title}
-                  </h3>
-                  <p className="mt-0.5 text-sm text-muted-foreground italic">
-                    {exp.company} | {exp.location}
-                  </p>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    {exp.period}
-                  </p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                    {exp.items.map((item) => (
-                      <li key={item.text}>
-                        {item.label ? (
-                          <>
-                            <span className="font-semibold text-foreground">
-                              {item.label}:
-                            </span>{" "}
-                            {item.text}
-                          </>
-                        ) : (
-                          item.text
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="mb-10">
-            <SectionHeading title="formación académica" />
-            <div className="flex flex-col gap-5">
-              {data.education.map((edu) => (
-                <div key={`${edu.degree}-${edu.institution}`}>
-                  <h3 className="font-heading text-base font-bold text-foreground">
-                    {edu.degree}
-                  </h3>
-                  {edu.date && (
-                    <p className="text-sm text-muted-foreground italic">
-                      {edu.date}
+          <Reveal>
+            <section className="mb-10">
+              <SectionHeading title="experiencia profesional" />
+              <div className="flex flex-col gap-8">
+                {data.experience.map((exp) => (
+                  <div key={`${exp.company}-${exp.period}`}>
+                    <h3 className="font-heading text-base font-bold text-foreground">
+                      {exp.title}
+                    </h3>
+                    <p className="mt-0.5 text-sm text-muted-foreground italic">
+                      {exp.company} | {exp.location}
                     </p>
-                  )}
-                  <p className="text-sm text-muted-foreground">
-                    {edu.institution}
-                  </p>
-                </div>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                      {exp.period}
+                    </p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                      {exp.items.map((item) => (
+                        <li key={item.text}>
+                          {item.label ? (
+                            <>
+                              <span className="font-semibold text-foreground">
+                                {item.label}:
+                              </span>{" "}
+                              {item.text}
+                            </>
+                          ) : (
+                            item.text
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </Reveal>
+
+          <Reveal>
+            <section className="mb-10">
+              <SectionHeading title="formación académica" />
+              <div className="flex flex-col gap-5">
+                {data.education.map((edu) => (
+                  <div key={`${edu.degree}-${edu.institution}`}>
+                    <h3 className="font-heading text-base font-bold text-foreground">
+                      {edu.degree}
+                    </h3>
+                    {edu.date && (
+                      <p className="text-sm text-muted-foreground italic">
+                        {edu.date}
+                      </p>
+                    )}
+                    <p className="text-sm text-muted-foreground">
+                      {edu.institution}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </Reveal>
+
+          <Reveal>
+            <section className="mb-10">
+              <SectionHeading title="desarrollo profesional continuo" />
+              <p className="text-base leading-relaxed text-foreground">
+                {data.continuousLearning}
+              </p>
+            </section>
+          </Reveal>
+
+          <Reveal>
+            <section className="mb-10">
+              <SectionHeading title="habilidades técnicas" />
+              {Object.entries(data.technicalSkills).map(([cat, skills]) => (
+                <SkillCategory key={cat} category={cat} skills={skills} />
               ))}
-            </div>
-          </section>
+            </section>
+          </Reveal>
 
-          <section className="mb-10">
-            <SectionHeading title="desarrollo profesional continuo" />
-            <p className="text-base leading-relaxed text-foreground">
-              {data.continuousLearning}
-            </p>
-          </section>
-
-          <section className="mb-10">
-            <SectionHeading title="habilidades técnicas" />
-            {Object.entries(data.technicalSkills).map(([cat, skills]) => (
-              <SkillCategory key={cat} category={cat} skills={skills} />
-            ))}
-          </section>
-
-          <section className="mb-10">
-            <SectionHeading title="habilidades blandas" />
-            {Object.entries(data.softSkills).map(([cat, skills]) => (
-              <SkillCategory key={cat} category={cat} skills={skills} />
-            ))}
-          </section>
-
-          <section className="mb-10">
-            <SectionHeading title="idiomas" />
-            <div className="grid grid-cols-2 gap-6">
-              {data.languages.map((lang) => (
-                <div key={lang.language}>
-                  <p className="font-heading text-base font-bold text-foreground">
-                    {lang.language}
-                  </p>
-                  <p className="text-sm text-muted-foreground">{lang.level}</p>
-                </div>
+          <Reveal>
+            <section className="mb-10">
+              <SectionHeading title="habilidades blandas" />
+              {Object.entries(data.softSkills).map(([cat, skills]) => (
+                <SkillCategory key={cat} category={cat} skills={skills} />
               ))}
-            </div>
-          </section>
+            </section>
+          </Reveal>
 
-          <section className="mb-10">
-            <SectionHeading title="intereses" />
-            <p className="text-sm text-muted-foreground">{data.hobbies}</p>
-          </section>
+          <Reveal>
+            <section className="mb-10">
+              <SectionHeading title="idiomas" />
+              <div className="grid grid-cols-2 gap-6">
+                {data.languages.map((lang) => (
+                  <div key={lang.language}>
+                    <p className="font-heading text-base font-bold text-foreground">
+                      {lang.language}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {lang.level}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </Reveal>
+
+          <Reveal>
+            <section className="mb-10">
+              <SectionHeading title="intereses" />
+              <p className="text-sm text-muted-foreground">{data.hobbies}</p>
+            </section>
+          </Reveal>
 
           <footer className="mt-12 border-t border-border pt-6 text-center text-xs text-muted-foreground">
             <p>{data.footer.privacyNotice}</p>

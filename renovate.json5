@@ -58,6 +58,21 @@
     },
 
     {
+      groupName: "Interfaz",
+      matchPackageNames: [
+        "shadcn",
+        "@base-ui/react",
+        "lucide-react",
+        "next-themes",
+        "motion",
+        "tailwind-merge",
+        "clsx",
+        "class-variance-authority",
+        "tw-animate-css",
+      ],
+      description: "Componentes, iconos, tema y animacion. Ojo con los majors: lucide 1.0 elimino los iconos de marca y hubo que sustituirlos por SVG locales. next-themes y motion tocan el retrato que reacciona al tema, cubierto por e2e.",
+    },
+    {
       groupName: "Pruebas",
       matchPackageNames: [
         "vitest",

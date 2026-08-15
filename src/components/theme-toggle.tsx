@@ -1,20 +1,21 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "next-themes";
 
 /**
  * Los dos iconos se renderizan siempre y es CSS quien decide cuál se ve, según
  * la clase `dark` del `<html>`. Así el botón coincide con el tema desde el
- * primer pintado, sin depender de que React se hidrate.
+ * primer pintado, sin depender de que React se hidrate ni de `resolvedTheme`,
+ * que en el primer render de next-themes todavía es `undefined`.
  */
 export function ThemeToggle() {
-  const { toggleTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   return (
     <button
       type="button"
-      onClick={toggleTheme}
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 text-muted-foreground backdrop-blur transition-colors hover:bg-accent"
       aria-label="Cambiar entre tema claro y oscuro"
     >

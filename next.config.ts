@@ -1,3 +1,4 @@
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
 /**
@@ -21,9 +22,13 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // No anunciar el framework en cada respuesta.
   poweredByHeader: false,
+  // `.mdx` cuenta como página: cada caso de /proyectos es un archivo MDX.
+  pageExtensions: ["ts", "tsx", "mdx"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({});
+
+export default withMDX(nextConfig);

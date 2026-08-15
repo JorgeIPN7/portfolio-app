@@ -127,3 +127,16 @@
     @apply font-sans;
   }
 }
+
+/*
+ * Al imprimir no hay scroll que dispare las apariciones de <Reveal>, así que
+ * las secciones que nunca se vieron en pantalla saldrían en blanco. Un CV se
+ * imprime: esto garantiza que salga entero. `!important` gana al estilo en
+ * línea que escribe motion.
+ */
+@media print {
+  main > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

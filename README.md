@@ -47,6 +47,23 @@ public/                PDF del CV, retrato y vídeo del retrato
 Para cambiar el contenido del CV basta con editar `src/data/resume-data.ts`:
 el tipo `ResumeData` marca el error si falta un campo o sobra uno.
 
+## Proyectos
+
+`/proyectos` es una sección en MDX: cada caso es un `page.mdx` bajo
+`src/app/proyectos/<slug>/`, y `src/data/projects.ts` guarda lo que se ve en el
+listado. Los estilos del Markdown salen de `src/mdx-components.tsx`.
+
+Para publicar un caso:
+
+1. Copia `src/app/proyectos/plantilla/` a `src/app/proyectos/<tu-slug>/` y
+   escribe el contenido. La plantilla trae la estructura de un caso: problema,
+   decisiones y resultado.
+2. Añade su entrada a `projects` en `src/data/projects.ts` con el mismo slug.
+3. Quita `draft: true` y borra el `robots` del `metadata` del MDX.
+
+Mientras no haya ningún caso publicado, el índice no se enlaza desde el CV ni
+entra en el `sitemap.xml`: una página vacía indexada no ayuda a nadie.
+
 ## Calidad
 
 | Herramienta    | Qué vigila                                           | Cuándo corre                        |
@@ -128,7 +145,28 @@ en los ajustes del proyecto.
 ## Stack
 
 Next.js 16 (App Router, Turbopack) · React 19 · TypeScript 5.9 · Tailwind CSS 4
-· shadcn sobre Base UI · lucide-react
+· shadcn sobre Base UI · lucide-react · next-themes · motion
+
+### Tema y animación
+
+El tema lo gestiona **next-themes** con `defaultTheme="dark"` y
+`enableSystem={false}`: la página abre siempre en oscuro y solo una elección
+guardada la saca de ahí. Es deliberadamente distinto de su comportamiento
+habitual, que sigue al esquema del sistema.
+
+**motion** hace dos cosas:
+
+- Rebobina el vídeo del retrato al volver al tema claro, interpolando
+  `currentTime` con una curva propia. Antes era un bucle de
+  `requestAnimationFrame` que restaba un paso fijo y se notaba a saltos.
+- Anima la aparición de las secciones al entrar en pantalla, vía
+  `src/components/reveal.tsx`.
+
+`Reveal` lleva dos salvaguardas, porque aquí un fallo no degrada la animación
+sino que **esconde el contenido**: un plazo de seguridad que muestra la sección
+aunque nunca cruce el viewport (Ctrl+F, teclas de inicio y fin, scroll
+programático), y una regla `@media print` que fuerza la opacidad, porque al
+imprimir no hay scroll que dispare nada y un CV se imprime.
 
 Las dependencias las mantiene Renovate. `renovate.json5` documenta por qué
 `eslint`, `typescript` y `@types/node` tienen un techo de versión: cada uno se

@@ -100,6 +100,58 @@ test.describe("retrato que responde al cambio de tema", () => {
     await checkPortraitReacts(page);
     await context.close();
   });
+
+  /**
+   * El rebobinado llegó a producción saltando de golpe (17 ms, un solo
+   * fotograma) y las pruebas no lo vieron: solo comprobaban que `currentTime`
+   * bajaba, y bajar de 4,9 a 0 en un fotograma también es bajar. Esta mide el
+   * recorrido, que es lo que el visitante percibe.
+   */
+  test("el rebobinado recorre el vídeo en vez de saltar al principio", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await waitForFrames(page);
+    await page.waitForFunction(
+      () => {
+        const video = document.querySelector("video");
+        return Boolean(video && video.currentTime > video.duration / 2);
+      },
+      undefined,
+      { timeout: 10_000 },
+    );
+
+    // Se arranca el muestreo antes del clic para no perder el principio.
+    const muestreo = page.evaluate(() => {
+      const video = document.querySelector("video");
+      if (!video) return null;
+      const inicio = performance.now();
+      const fotogramas = new Set<string>();
+      return new Promise<{ ms: number; fotogramas: number }>((resolve) => {
+        let ultimoCambio = inicio;
+        const id = window.setInterval(() => {
+          const antes = fotogramas.size;
+          fotogramas.add(video.currentTime.toFixed(2));
+          if (fotogramas.size !== antes) ultimoCambio = performance.now();
+          if (performance.now() - inicio > 4000) {
+            window.clearInterval(id);
+            resolve({
+              ms: Math.round(ultimoCambio - inicio),
+              fotogramas: fotogramas.size,
+            });
+          }
+        }, 16);
+      });
+    });
+
+    await page.click(TOGGLE);
+    const medicion = await muestreo;
+
+    // El vídeo dura ~5 s y se rebobina a 2,4x: alrededor de 2 s. Los márgenes
+    // son anchos a propósito, para no atarse a la máquina que ejecute esto.
+    expect(medicion!.ms).toBeGreaterThan(800);
+    expect(medicion!.fotogramas).toBeGreaterThan(20);
+  });
 });
 
 test.describe("tema", () => {
