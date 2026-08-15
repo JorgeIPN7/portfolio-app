@@ -211,6 +211,31 @@ El orden de las clases de Tailwind lo pone `prettier-plugin-tailwindcss`. Como
 en Tailwind 4 no hay `tailwind.config`, `prettier.config.mjs` le señala el CSS
 de entrada con `tailwindStylesheet`.
 
+### Servidor MCP de Playwright
+
+`.mcp.json` declara el [servidor MCP de Playwright](https://github.com/microsoft/playwright-mcp),
+que permite a un agente abrir la página en un navegador real y mirarla: navegar,
+hacer capturas y evaluar JavaScript. Aquí no es un lujo — dos regresiones del
+retrato pasaron el build, el lint y el typecheck sin que nadie se enterara, y
+solo se vieron abriendo el navegador.
+
+Al estar en el repo, va por proyecto y no por ruta absoluta: la configuración
+anterior estaba atada a una carpeta concreta del equipo y dejaba de valer al
+mover el clon.
+
+Dos decisiones que conviene no deshacer sin querer:
+
+- **`--browser chrome`**, por lo mismo que `playwright.config.ts`: el Chromium
+  que descarga Playwright no trae códecs propietarios y no decodifica el H.264
+  del retrato (`DEMUXER_ERROR_NO_SUPPORTED_STREAMS`). Sin esta opción, un
+  agente vería el póster y concluiría que el vídeo no funciona.
+- **Se ejecuta con `npx` y no como `devDependency`**, aunque el resto del repo
+  fije versiones. `@playwright/mcp` depende de `playwright` en versión alpha, y
+  meterlo en el árbol pondría una alpha junto al `@playwright/test` estable y
+  fijado que corre las pruebas. Es una herramienta de desarrollo, fuera del
+  build y del sitio publicado; el precio de `@latest` es que no lo vigila
+  Renovate.
+
 ### `git blame` y el commit de formato
 
 El reformateo inicial tocó casi todos los archivos. Para que no aparezca como
