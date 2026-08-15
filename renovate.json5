@@ -45,6 +45,17 @@
       groupName: "Tailwind CSS",
       matchPackageNames: ["tailwindcss", "@tailwindcss/*"],
     },
+    {
+      groupName: "Herramientas de calidad",
+      matchPackageNames: [
+        "prettier",
+        "prettier-plugin-*",
+        "husky",
+        "lint-staged",
+        "knip",
+      ],
+      description: "Formato, hooks de pre-commit y deteccion de codigo muerto. Van juntas porque un cambio en cualquiera se nota en el mismo sitio: el commit. Un major de prettier puede reformatear el repo entero; se resuelve con un commit de solo formato y una linea nueva en .git-blame-ignore-revs. lint-staged 17 exige Node >=22.22.1: revisar engines antes de aceptar su siguiente major.",
+    },
 
     // ---- Techos de versión verificados el 15-ago-2026 ----
     // No son preferencias: cada uno se probó instalándolo y rompió.
