@@ -1,0 +1,18 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "montserrat",
+        "createdAt": "2026-08-15T17:35:57.257Z",
+        "reason": "Fuente elegida del proyecto (next/font/local); ver DESIGN.md"
+      }
+    ]
+  },
+  "buildPath": "code",
+  "hook": {
+    "quiet": true
+  }
+}

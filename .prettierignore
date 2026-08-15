@@ -14,3 +14,11 @@ blob-report/
 # Lo reescribe `next dev` en cada arranque: formatearlo produce un diff que
 # Next revierte al siguiente arranque.
 AGENTS.md
+
+# Skills de terceros para agentes (impeccable, ui-skills, emilkowalski/skills):
+# se instalan con `npx impeccable install` y `npx skills add`, y se actualizan
+# desde su repo de origen. Formatearlas produce un diff contra ese origen que
+# el siguiente `update` pisaría.
+.claude/skills/
+# La skill orquestadora es nuestra, sí se formatea.
+!.claude/skills/design-workflow/

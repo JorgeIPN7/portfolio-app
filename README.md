@@ -54,6 +54,11 @@ src/
   env.ts               Esquema de variables de entorno
   proxy.ts             Negociación de idioma (el antiguo middleware.ts)
 public/                PDF del CV, retrato y vídeo del retrato
+docs/                  Documentos de trabajo (comparativa de skills de diseño)
+.claude/skills/        Skills de diseño para agentes (vendor) y design-workflow
+.impeccable/           Configuración compartida de impeccable
+DESIGN.md              Sistema visual documentado (lo leen las skills)
+PRODUCT.md             Verdad de producto (la lee impeccable)
 ```
 
 Para cambiar el contenido del CV se editan `src/data/resume-data.es.ts` y
@@ -235,6 +240,87 @@ Dos decisiones que conviene no deshacer sin querer:
   fijado que corre las pruebas. Es una herramienta de desarrollo, fuera del
   build y del sitio publicado; el precio de `@latest` es que no lo vigila
   Renovate.
+
+### Skills de diseño para agentes
+
+Nada del toolchain opina sobre diseño: un componente puede pasar formato, lint,
+tipos y pruebas y aun así tener la jerarquía rota, una animación de 800 ms con
+`ease-in` o un contraste que axe no mide porque cambia con el tema. Las skills
+de `.claude/skills/` le dan al agente (Claude Code) criterio y un contrato
+compartido para eso. Se eligieron tras comparar cinco colecciones —el detalle,
+con números y descartes, está en [`docs/skills-de-diseno.md`](docs/skills-de-diseno.md)—
+y se reparten así:
+
+| Skill                                                                                                                                      | Origen                                                                  | Para qué                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `impeccable`                                                                                                                               | [pbakaus/impeccable](https://github.com/pbakaus/impeccable)             | El flujo principal: `/impeccable critique`, `audit`, `polish`, `harden`, `typeset`, `layout`, `clarify`, `document`… y un detector determinista de 59 reglas                                                                                                     |
+| `baseline-ui`, `fixing-accessibility`, `fixing-motion-performance`, `fixing-metadata`                                                      | [ibelick/ui-skills](https://github.com/ibelick/ui-skills)               | Reglas baratas MUST/NEVER al editar UI y revisores puntuales de accesibilidad, rendimiento de animación y SEO/Open Graph/JSON-LD                                                                                                                                 |
+| `animate`, `review-animations`, `pick-ui-library`                                                                                          | [emilkowalski/skills](https://github.com/emilkowalski/skills)           | La autoridad en animación (curvas y duraciones exactas, recetas para Base UI), el revisor de movimiento y la lista de librerías                                                                                                                                  |
+| `design-workflow`                                                                                                                          | Propia                                                                  | La orquestadora: enruta la tarea, fija quién manda si dos se contradicen y recoge las reglas de Next 16 / Tailwind 4 / Base UI / `motion` v13                                                                                                                    |
+| `vercel-react-best-practices`, `vercel-composition-patterns`, `vercel-react-view-transitions`, `web-design-guidelines`, `deploy-to-vercel` | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | Oficiales de Vercel: 72 reglas de rendimiento React/Next por impacto, patrones de composición (React 19, `render` de Base UI), transiciones de ruta con `<ViewTransition>`, auditoría terse contra las Web Interface Guidelines y despliegue a Vercel a petición |
+
+El pegamento entre ellas son tres archivos versionados: **`DESIGN.md`** (el
+sistema visual tal como está implementado, en el
+[formato design.md](https://github.com/google-labs-code/design.md); impeccable
+lo carga y su detector compara fuentes, colores y radios con él),
+**`PRODUCT.md`** (usuarios, propósito y restricciones; impeccable lo pide antes
+de criticar o pulir; los datos inferidos están marcados para confirmarlos) y
+**`.impeccable/config.json`** (ignores compartidos, hook silencioso). Si un
+cambio de diseño se acepta, `DESIGN.md` se actualiza en el mismo commit y se
+valida con `npx @google/design.md lint DESIGN.md`.
+
+**Cuándo y cómo.** La skill `design-workflow` se carga sola ante cualquier
+tarea de UI y decide; estos son los casos típicos, con lo que se puede pedir:
+
+| Situación                                                                   | Qué pedir o invocar                                                                    | Qué pasa                                                                                                                                                    |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| «Revisa el diseño de la sección de experiencia»                             | `/impeccable critique src/app/[locale]/page.tsx`                                       | Informe de solo lectura (heurísticas, jerarquía, carga cognitiva) con memoria en `.impeccable/critique/`                                                    |
+| «Pule la columna lateral sin cambiar su identidad»                          | `/baseline-ui src/app/[locale]/page.tsx` y después `/impeccable polish`                | Primero el suelo de reglas (espaciado, jerarquía, tipografía), luego el afinado                                                                             |
+| «Añade una animación de entrada al formulario»                              | Pedirlo tal cual; `animate` se activa                                                  | Decide si animar, con qué (CSS o `motion`), qué propiedades, curva y duración, y lo implementa                                                              |
+| Antes de commitear una animación                                            | `/review-animations`                                                                   | Bloquea o aprueba con `archivo:línea` contra los estándares de Emil Kowalski                                                                                |
+| «El formulario no se entiende con lector de pantalla»                       | `/fixing-accessibility src/components/contact-form.tsx`, luego `pnpm test:e2e`         | Arreglos mínimos de ARIA, foco y errores; las pruebas con axe son el árbitro                                                                                |
+| «Revisa el Open Graph, el canonical y el JSON-LD»                           | `/fixing-metadata src/app/[locale]/layout.tsx`                                         | Audita y corrige vía la Metadata API de Next, con `hreflang` por idioma                                                                                     |
+| «En inglés los textos largos rompen el layout»                              | `/impeccable harden`                                                                   | Estados vacíos, textos extremos, overflow, i18n                                                                                                             |
+| Pasada rápida sin agente (o en CI)                                          | `npx impeccable detect src`                                                            | El detector determinista, sin LLM; hoy devuelve 0 hallazgos                                                                                                 |
+| «¿Qué librería uso para un menú de comandos, toasts o gráficos?»            | `/pick-ui-library`                                                                     | Recomendación curada (aquí ya están Base UI, `motion`, next-themes, lucide)                                                                                 |
+| «Revisa el rendimiento de la página de proyectos» (waterfalls, bundle, RSC) | Pedirlo tal cual; `vercel-react-best-practices` se activa                              | Aplica las reglas de Vercel Engineering por impacto; impeccable `optimize` se queda en la capa visual                                                       |
+| «Anima el paso del CV a `/proyectos`»                                       | Pedirlo tal cual; `vercel-react-view-transitions` (+ valores de `animate`)             | `<ViewTransition>` funciona en Next 16.3 sin configuración ni `react@canary` (la doc local de Next recomienda esta skill); revisar con `/review-animations` |
+| Segunda opinión rápida sobre un archivo de UI                               | `web-design-guidelines src/components/contact-form.tsx`                                | 93 reglas de las Web Interface Guidelines de Vercel, salida `archivo:línea`; descarga las reglas por red                                                    |
+| «Despliega una preview»                                                     | `/deploy-to-vercel` (solo manual: está en `skillOverrides` como `user-invocable-only`) | Aquí desplegar es hacer push; la skill queda para previews con `vercel deploy`, y nunca commitea, hace push ni sube el proyecto a terceros                  |
+
+Cuándo **no**: para trabajo de backend, datos o solo textos no hacen falta (y
+`design-workflow` lo dice), y un rediseño de la identidad (`/impeccable init`,
+new-work, `bolder`) requiere al dueño presente porque pregunta antes de decidir.
+
+Tres reglas del reparto que conviene conocer porque resuelven contradicciones
+reales entre las colecciones: en movimiento mandan los **valores de Emil**
+(impeccable aporta el «por qué», no otros números); las curvas propias se
+definen como tokens en `@theme inline` con un nombre que no pise los
+`--ease-out`/`--ease-in-out` que Tailwind 4 ya trae; y `prefers-reduced-motion`
+reduce el movimiento ambiental pero **no anula el vídeo del retrato**, que
+responde a un clic. Se descartaron taste-skill (hace lo mismo que impeccable a
+22k tokens por activación y prohíbe la serif, lucide y la raya), UI/UX Pro Max
+(su buscador exige Python, y para e-commerce solo trae dos filas de reglas y
+tres paletas), `frontend-design` de Anthropic (impeccable nació de ella y ya
+contiene sus reglas) y huashu-design (prototipos y vídeos en HTML suelto, en
+chino, ≈50k tokens por activación; no produce código Next); `docs/skills-de-diseno.md`
+explica cómo usarlas bajo demanda —con `skillOverrides` en modo solo-manual—
+si algún día hacen falta.
+
+Detalles operativos:
+
+- Las carpetas de terceros en `.claude/skills/` son código vendor: se actualizan
+  con `npx impeccable update` y `npx skills update` (`skills-lock.json` guarda
+  origen y hash) y **no se editan**. Prettier, ESLint y knip las ignoran a
+  propósito; `design-workflow` sí se formatea.
+- El hook de impeccable vive en `.claude/settings.local.json`, donde lo escribe
+  su instalador: pasa el detector tras cada edición de un archivo de UI y una
+  pasada profunda al terminar el turno (≈0,2–0,6 s, nunca bloquea). Está en modo
+  silencioso (`.impeccable/config.json`); `/impeccable hooks off` lo apaga y
+  `npx impeccable ignores add-value <regla> <valor> --reason "…"` registra un
+  falso positivo en la configuración compartida.
+- `npx impeccable` instala Puppeteer como dependencia opcional y descarga Chrome
+  (≈700 MB) en `~/.cache/puppeteer`; solo lo usa `detect <url>`. Se puede borrar.
 
 ### `git blame` y el commit de formato
 
