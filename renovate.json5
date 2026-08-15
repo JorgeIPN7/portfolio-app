@@ -57,6 +57,21 @@
       description: "Formato, hooks de pre-commit y deteccion de codigo muerto. Van juntas porque un cambio en cualquiera se nota en el mismo sitio: el commit. Un major de prettier puede reformatear el repo entero; se resuelve con un commit de solo formato y una linea nueva en .git-blame-ignore-revs. lint-staged 17 exige Node >=22.22.1: revisar engines antes de aceptar su siguiente major.",
     },
 
+    {
+      groupName: "Pruebas",
+      matchPackageNames: [
+        "vitest",
+        "@vitest/*",
+        "@vitejs/plugin-react",
+        "vite",
+        "jsdom",
+        "@testing-library/*",
+        "@playwright/test",
+        "@axe-core/*",
+      ],
+      description: "Corredores, entorno DOM y utilidades de prueba. Van juntas porque se rompen entre si: @vitejs/plugin-react 6 exige vite ^8, y vitest arrastra su propia version de vite. Playwright fija version exacta porque su binario de navegador se instala aparte con 'pnpm exec playwright install'.",
+    },
+
     // ---- Techos de versión verificados el 15-ago-2026 ----
     // No son preferencias: cada uno se probó instalándolo y rompió.
     // Al levantar un techo, borrar la regla y correr build + lint + typecheck.

@@ -26,6 +26,8 @@ pnpm dev         # http://localhost:3000
 | `pnpm format`       | Prettier sobre todo el repo (escribe)      |
 | `pnpm format:check` | Prettier en modo comprobación (no escribe) |
 | `pnpm knip`         | Archivos, exports y dependencias sin usar  |
+| `pnpm test`         | Pruebas unitarias con Vitest               |
+| `pnpm test:watch`   | Vitest en modo observación                 |
 | `pnpm test:e2e`     | Playwright (levanta el servidor él solo)   |
 
 ## Estructura
@@ -53,7 +55,31 @@ el tipo `ResumeData` marca el error si falta un campo o sobra uno.
 | ESLint         | Reglas de Next y de TypeScript                       | Al commitear y con `pnpm lint`      |
 | `tsc --noEmit` | Tipos del proyecto entero                            | Al commitear y con `pnpm typecheck` |
 | knip           | Archivos, exports y dependencias sin usar            | A mano, con `pnpm knip`             |
+| Vitest         | Lógica y componentes en aislamiento                  | A mano, con `pnpm test`             |
 | Playwright     | Que la página siga funcionando de verdad             | A mano, con `pnpm test:e2e`         |
+
+### Pruebas
+
+Los tests unitarios viven junto al código que prueban (`src/**/*.test.ts?(x)`)
+y los E2E en `e2e/`. Vitest excluye `e2e/` a propósito: esos los corre
+Playwright.
+
+Qué cubre cada uno:
+
+- **Vitest** — `cn()`, el proveedor de tema (persistencia, clase del `<html>`,
+  fallo fuera del provider), los iconos de marca y los invariantes de
+  `resume-data.ts`: URLs válidas, campos sin vaciar y unicidad de las claves
+  que `page.tsx` usa como `key` de React.
+- **Playwright** — el ciclo completo del retrato al cambiar de tema, la
+  persistencia tras recargar, y accesibilidad con axe (WCAG 2.1 AA) en los dos
+  temas, porque el contraste de la paleta clara y la oscura es distinto.
+
+Playwright usa el Chrome del sistema, no el Chromium que él descarga: ese viene
+sin códecs propietarios y no decodifica el vídeo del retrato. Reutiliza el
+servidor del puerto 3000 si ya lo tienes abierto.
+
+Los async Server Components no se prueban con Vitest —React aún no lo
+soporta—; para eso está el E2E, tal y como recomienda la guía de Next.
 
 El hook de pre-commit lo engancha husky en cada `pnpm install`, vía el script
 `prepare`: en un clon recién hecho no hay hooks hasta que instalas. Corre
