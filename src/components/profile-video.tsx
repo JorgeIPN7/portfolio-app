@@ -5,11 +5,17 @@ import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef } from "react";
 
 /**
- * Cuántas veces más rápido va el rebobinado que la reproducción normal. El
- * bucle manual que había antes restaba 0,04 s por fotograma a 60 fps, es decir
- * 2,4x: se conserva esa sensación.
+ * Velocidad de la ida, al pasar a oscuro. El vídeo dura ~5 s a velocidad real,
+ * demasiado para lo que es la respuesta a un clic.
  */
-const REWIND_SPEED = 3;
+const FORWARD_SPEED = 3.33;
+
+/**
+ * Cuántas veces más rápido va la vuelta. Va por encima de la ida a propósito:
+ * deshacer se lee mejor rápido. La prueba e2e exige que el recorrido dure más
+ * de 800 ms, así que por encima de ~6 empezaría a fallar, y con razón.
+ */
+const REWIND_SPEED = 3.33;
 
 /** Margen sobre el final: algunos códecs no tienen fotograma exacto en `duration`. */
 const END_MARGIN = 0.05;
@@ -141,6 +147,9 @@ export function ProfileVideo({ poster }: { poster: string }) {
       if (resolvedTheme === "dark") {
         stopRewind();
         video.currentTime = 0;
+        // Se fija aquí y no una sola vez al montar porque `load()`, que puede
+        // dispararse con la precarga diferida, lo devuelve a 1.
+        video.playbackRate = FORWARD_SPEED;
         // Puede rechazarse por ahorro de batería; el póster se queda.
         void video.play().catch(() => {});
       } else {
