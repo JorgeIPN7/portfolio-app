@@ -1,31 +1,28 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
 
-type Theme = "dark" | "light";
-
-const ThemeContext = createContext<{
-  theme: Theme;
-  toggleTheme: () => void;
-}>({
-  theme: "light",
-  toggleTheme: () => {},
-});
-
+/**
+ * Envuelve a next-themes con la configuración de este sitio.
+ *
+ * `defaultTheme="dark"` con `enableSystem={false}`: la página abre siempre en
+ * oscuro y solo una elección explícita guardada la saca de ahí. Es a propósito
+ * distinto del comportamiento habitual de next-themes, que sigue al sistema.
+ *
+ * El script antiparpadeo ya no se escribe a mano en `layout.tsx`: lo inyecta
+ * next-themes antes del primer pintado.
+ */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
-
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
-
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem={false}
+      storageKey={THEME_STORAGE_KEY}
+      disableTransitionOnChange
+    >
       {children}
-    </ThemeContext.Provider>
+    </NextThemesProvider>
   );
 }
-
-export const useTheme = () => useContext(ThemeContext);

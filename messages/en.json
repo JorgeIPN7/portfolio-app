@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "title": "Jorge Herminio López Vázquez — Senior Full-Stack Engineer",
+    "description": "Senior Full-Stack Engineer, 8+ years in fintech, proptech and blockchain. SPEI/STP payments, real estate tokenization and products shipped from Mexico City.",
+    "keywords": "Full-Stack Engineer, Tech Lead, Fintech, Proptech, Blockchain, Next.js, NestJS, TypeScript, SPEI, Real estate tokenization, Mexico City"
+  },
+  "sections": {
+    "contact": "contact",
+    "profile": "professional profile",
+    "experience": "professional experience",
+    "education": "education",
+    "continuousLearning": "continuous professional development",
+    "technicalSkills": "technical skills",
+    "softSkills": "soft skills",
+    "languages": "languages",
+    "interests": "interests",
+    "writeToMe": "get in touch"
+  },
+  "actions": {
+    "downloadCv": "Download CV as PDF",
+    "toggleTheme": "Switch between light and dark theme",
+    "viewProjects": "View projects",
+    "switchLanguage": "Change language",
+    "languageName": "English",
+    "otherLanguageName": "Español"
+  },
+  "principles": {
+    "thoughts": "Master your thoughts before your actions",
+    "promises": "Keep your promises, even when nobody is watching",
+    "train": "Train your mind the way you train your body",
+    "start": "Learn to begin even when you don't feel like it",
+    "finish": "Finish what you start, even when it hurts"
+  },
+  "footer": {
+    "lastUpdated": "Last updated: {date}"
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "Fintech, proptech and blockchain case studies: the problem they solved, the technical decisions taken and how they ended up.",
+    "subtitle": "Case studies with the problem, the technical decisions and the outcome.",
+    "backToCv": "Back to the CV",
+    "empty": "No case studies published yet."
+  },
+  "contactForm": {
+    "intro": "A role, a technical question or an idea? Write to me here and I'll reply to the address you leave.",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "messagePlaceholder": "Tell me what you have in mind.",
+    "submit": "Send message",
+    "submitting": "Sending…",
+    "success": "Message sent. I'll get back to you shortly.",
+    "unavailable": "Sending isn't available right now. Write to me directly at {email}.",
+    "unexpectedError": "The message couldn't be sent. Try again or write to me directly at {email}.",
+    "errorSummary": "Please check the highlighted fields.",
+    "validation": {
+      "nameMin": "Please enter your name.",
+      "nameMax": "The name can't be longer than {max} characters.",
+      "email": "That email doesn't look valid, and without it I can't reply.",
+      "messageMin": "Tell me a bit more: at least {min} characters.",
+      "messageMax": "The message can't be longer than {max} characters."
+    }
+  }
+}

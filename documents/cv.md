@@ -5,9 +5,11 @@
 ```
 Ciudad de México | +52 55 8617 0161 (preferencia por WhatsApp) | jorge.ipn.7@gmail.com
 ```
+
 ```
 LinkedIn | GitHub
 ```
+
 ## RESUMEN PROFESIONAL
 
 Ingeniero de software con más de 8 años de experiencia desarrollando software en los sectores Fintech,
@@ -28,6 +30,7 @@ JavaScript (ES6+)
 Cloud e Infra: AWS (EC2, S3, RDS, VPC, VPN),
 Azure (Functions, DevOps)
 ```
+
 ```
 Bases de Datos: PostgreSQL, SQL Server,
 MongoDB, CosmosDB, TypeORM, Entity Framework
@@ -38,6 +41,7 @@ Gestión: Experiencia liderando equipos pequeños
 de devs, Scrum, Kanban, Experiencia en
 coordinación cross-border
 ```
+
 ## EXPERIENCIA PROFESIONAL
 
 ## Tech Lead & Senior Full-Stack Engineer Oct 2023 – Presente
@@ -60,6 +64,7 @@ crypto wallet internamente como desarrollador único, sin sacrificar calidad ni 
 ucraniano gestionando entregas cross-timezone. Traduzco requerimientos de negocio en
 especificaciones técnicas y MVPs.
 ```
+
 ## Full-Stack Engineer & Equipo Fundador Sep 2021 – Sep 2023
 
 _Clikalia — Plataforma Proptech (respaldada por Scotiabank)_ | CDMX / Madrid, España
@@ -80,6 +85,7 @@ automatizando captación de leads y sincronización de datos entre áreas.
 ▪ Promoción por Desempeño: Seleccionado para trabajar directamente con ingeniería en España,
 sirviendo como puente técnico entre operaciones mexicana y europea.
 ```
+
 ## Desarrollador Backend (.NET) Sep 2018 – Sep 2021
 
 _SmartByte — Consultoría de Software (Cliente: PwC México)_ | Ciudad de México
@@ -93,6 +99,7 @@ mejorando rendimiento de consultas en entornos de alto volumen financiero.
 ▪ Metodologías Ágiles: Contribuí a la adopción de Scrum/Kanban con Azure DevOps, acelerando
 ciclos de entrega del equipo de consultoría.
 ```
+
 ## Analista de Software Sep 2017 – Sep 2018
 
 _SONDA — Consultoría TI (Cliente: Palacio de Hierro)_ | Ciudad de México
@@ -104,6 +111,7 @@ México.
 ▪ Desarrollé scripts de consulta a bases de datos que aceleraron la resolución de incidencias,
 aportando capacidades de desarrollo más allá del rol asignado.
 ```
+
 ## Desarrollador Web (Único desarrollador) 2016 – 2017
 
 _Regenersis México — Reparación de Dispositivos_ | Ciudad de México
@@ -114,6 +122,7 @@ JavaScript, jQuery y MySQL, integrando pagos con PayPal. Abrí nuevo canal de in
 ▪ Automatización: Construí herramientas internas de nómina y gestión de asistencias que
 sustituyeron software de terceros, generando ahorros directos.
 ```
+
 ## FORMACIÓN ACADÉMICA
 
 ## Ingeniería en Sistemas Computacionales
@@ -131,7 +140,6 @@ Node.js → Blockchain) fue liderada por iniciativa propia.
 **Español:** Nativo **Inglés:** B2 —
 Competencia profesional
 
-
 ## INFORMACIÓN ADICIONAL
 
 Experiencia coordinando y trabajando con equipos distribuidos entre México, España y Ucrania.
@@ -141,5 +149,3 @@ border. Colaboración con equipos de alto perfil como Bitso. Fiel creyente de la
 personas con las que te rodeas” así que siempre aporto lo mejor de mí a mi equipo y colegas de equipo,
 así como a las personas que me rodean. Soy un hombre mentalidad estoica, analítica, lógica y fiel
 creyente de la frase platónica “El ejercicio debe ser para el cuerpo lo que la educación es para el alma"
-
-

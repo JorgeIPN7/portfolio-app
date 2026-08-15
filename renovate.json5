@@ -1,0 +1,131 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+
+  timezone: "America/Mexico_City",
+  // Una tanda semanal en vez de PRs goteando toda la semana.
+  schedule: ["before 7am on monday"],
+  prConcurrentLimit: 5,
+  prHourlyLimit: 2,
+  semanticCommits: "enabled",
+  // No proponer una versión recién publicada: darle unos días a que salgan
+  // sus parches de emergencia.
+  minimumReleaseAge: "3 days",
+  postUpdateOptions: ["pnpmDedupe"],
+
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["before 7am on the first day of the month"],
+  },
+
+  packageRules: [
+    {
+      // Las majors no abren PR solas: se listan en el Dependency Dashboard y
+      // se sueltan marcando su casilla. Evita despertar con un PR que sube
+      // ESLint o TypeScript de línea sin que nadie lo haya decidido.
+      matchUpdateTypes: ["major"],
+      dependencyDashboardApproval: true,
+    },
+
+    // ---- Agrupaciones: paquetes que deben moverse juntos o no moverse ----
+    {
+      groupName: "Next.js",
+      matchPackageNames: ["next", "eslint-config-next", "@next/*"],
+    },
+    {
+      groupName: "React",
+      matchPackageNames: [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+      ],
+    },
+    {
+      groupName: "Tailwind CSS",
+      matchPackageNames: ["tailwindcss", "@tailwindcss/*"],
+    },
+    {
+      groupName: "Herramientas de calidad",
+      matchPackageNames: [
+        "prettier",
+        "prettier-plugin-*",
+        "husky",
+        "lint-staged",
+        "knip",
+      ],
+      description: "Formato, hooks de pre-commit y deteccion de codigo muerto. Van juntas porque un cambio en cualquiera se nota en el mismo sitio: el commit. Un major de prettier puede reformatear el repo entero; se resuelve con un commit de solo formato y una linea nueva en .git-blame-ignore-revs. lint-staged 17 exige Node >=22.22.1: revisar engines antes de aceptar su siguiente major.",
+    },
+
+    {
+      groupName: "Interfaz",
+      matchPackageNames: [
+        "shadcn",
+        "@base-ui/react",
+        "lucide-react",
+        "next-themes",
+        "motion",
+        "tailwind-merge",
+        "clsx",
+        "class-variance-authority",
+        "tw-animate-css",
+      ],
+      description: "Componentes, iconos, tema y animacion. Ojo con los majors: lucide 1.0 elimino los iconos de marca y hubo que sustituirlos por SVG locales. next-themes y motion tocan el retrato que reacciona al tema, cubierto por e2e.",
+    },
+    {
+      groupName: "Pruebas",
+      matchPackageNames: [
+        "vitest",
+        "@vitest/*",
+        "@vitejs/plugin-react",
+        "vite",
+        "jsdom",
+        "@testing-library/*",
+        "@playwright/test",
+        "@axe-core/*",
+      ],
+      description: "Corredores, entorno DOM y utilidades de prueba. Van juntas porque se rompen entre si: @vitejs/plugin-react 6 exige vite ^8, y vitest arrastra su propia version de vite. Playwright fija version exacta porque su binario de navegador se instala aparte con 'pnpm exec playwright install'.",
+    },
+
+    {
+      groupName: "Datos y formularios",
+      matchPackageNames: [
+        "zod",
+        "@t3-oss/env-nextjs",
+        "next-safe-action",
+        "resend",
+      ],
+      description: "Validacion, entorno tipado, Server Actions y envio de correo. Van juntas porque zod es la base de las otras dos: t3-oss y next-safe-action lo consumen via Standard Schema, y un major de zod las arrastra. next-safe-action 8 ya no necesita adaptador de validacion. El formulario de contacto esta cubierto por e2e.",
+    },
+    {
+      groupName: "Internacionalizacion",
+      matchPackageNames: ["next-intl", "use-intl"],
+      description: "next-intl y su nucleo use-intl se publican con la misma version y hay que moverlos a la vez. Arrastra @swc/core y @parcel/watcher, cuyos scripts de instalacion estan desactivados en pnpm-workspace.yaml porque hay binario precompilado: si un major cambia eso, el arranque falla. El enrutado /es y /en esta cubierto por e2e.",
+    },
+
+    // ---- Techos de versión verificados el 15-ago-2026 ----
+    // No son preferencias: cada uno se probó instalándolo y rompió.
+    // Al levantar un techo, borrar la regla y correr build + lint + typecheck.
+    {
+      matchPackageNames: ["eslint"],
+      allowedVersions: "<10",
+      description: "ESLint 10 rompe el lint: eslint-plugin-react@7.37.5, que entra por eslint-config-next, declara ESLint ^9 como maximo y llama a una API retirada (contextOrFilename.getFilename is not a function). Levantar cuando los plugins de eslint-config-next declaren ^10.",
+    },
+    {
+      matchPackageNames: ["typescript"],
+      allowedVersions: "<6",
+      description: "TypeScript 7 rompe el lint: typescript-eslint@8 declara typescript >=4.8.4 <6.1.0 y su parser falla al cargar (Cannot read properties of undefined (reading 'Cjs')). tsc si compila. Levantar cuando typescript-eslint publique soporte para TS 7.",
+    },
+    {
+      matchPackageNames: ["@types/node"],
+      allowedVersions: "<23",
+      description: "@types/node sigue la linea de Node, no la ultima publicada. El proyecto corre en Node 22 (.nvmrc y engines), asi que los tipos se quedan en 22.x.",
+    },
+    {
+      matchDatasources: ["node-version", "docker"],
+      matchPackageNames: ["node"],
+      allowedVersions: "<23",
+      description: "Node fijado a la linea 22 LTS (Jod) en .nvmrc, engines y cualquier imagen. Cambiar de linea es una decision, no una actualizacion.",
+    },
+  ],
+}

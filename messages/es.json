@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "title": "Jorge Herminio López Vázquez — Senior Full-Stack Engineer",
+    "description": "Senior Full-Stack Engineer con +8 años en fintech, proptech y blockchain. Pagos SPEI/STP, tokenización inmobiliaria y producto en producción desde CDMX.",
+    "keywords": "Full-Stack Engineer, Tech Lead, Fintech, Proptech, Blockchain, Next.js, NestJS, TypeScript, SPEI, Tokenización inmobiliaria, Ciudad de México"
+  },
+  "sections": {
+    "contact": "contacto",
+    "profile": "perfil profesional",
+    "experience": "experiencia profesional",
+    "education": "formación académica",
+    "continuousLearning": "desarrollo profesional continuo",
+    "technicalSkills": "habilidades técnicas",
+    "softSkills": "habilidades blandas",
+    "languages": "idiomas",
+    "interests": "intereses",
+    "writeToMe": "escríbeme"
+  },
+  "actions": {
+    "downloadCv": "Descargar CV en PDF",
+    "toggleTheme": "Cambiar entre tema claro y oscuro",
+    "viewProjects": "Ver proyectos",
+    "switchLanguage": "Cambiar idioma",
+    "languageName": "Español",
+    "otherLanguageName": "English"
+  },
+  "principles": {
+    "thoughts": "Controla tus pensamientos antes que tus actos",
+    "promises": "Cumple tus promesas, aunque nadie mire",
+    "train": "Entrena la mente como entrenas el cuerpo",
+    "start": "Aprende a comenzar aunque no tengas ganas",
+    "finish": "Termina lo que empiezas, aunque duela"
+  },
+  "footer": {
+    "lastUpdated": "Última actualización: {date}"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "description": "Casos de fintech, proptech y blockchain: qué problema resolvían, qué decisiones técnicas se tomaron y en qué acabaron.",
+    "subtitle": "Casos con el problema, las decisiones técnicas y el resultado.",
+    "backToCv": "Volver al CV",
+    "empty": "Todavía no hay casos publicados."
+  },
+  "contactForm": {
+    "intro": "¿Una vacante, una consulta técnica o una idea? Escríbeme por aquí y respondo al correo que dejes.",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "message": "Mensaje",
+    "messagePlaceholder": "Cuéntame en qué estás pensando.",
+    "submit": "Enviar mensaje",
+    "submitting": "Enviando…",
+    "success": "Mensaje enviado. Te respondo en cuanto pueda.",
+    "unavailable": "El envío no está disponible ahora mismo. Escríbeme directamente a {email}.",
+    "unexpectedError": "No se pudo enviar el mensaje. Inténtalo otra vez o escríbeme directamente a {email}.",
+    "errorSummary": "Revisa los campos marcados.",
+    "validation": {
+      "nameMin": "Escribe tu nombre.",
+      "nameMax": "El nombre no puede pasar de {max} caracteres.",
+      "email": "Ese correo no parece válido; sin él no puedo responderte.",
+      "messageMin": "Cuéntame algo más: al menos {min} caracteres.",
+      "messageMax": "El mensaje no puede pasar de {max} caracteres."
+    }
+  }
+}
