@@ -82,9 +82,11 @@ Los async Server Components no se prueban con Vitest —React aún no lo
 soporta—; para eso está el E2E, tal y como recomienda la guía de Next.
 
 El hook de pre-commit lo engancha husky en cada `pnpm install`, vía el script
-`prepare`: en un clon recién hecho no hay hooks hasta que instalas. Corre
-formato y lint sobre lo indexado, y el typecheck sobre el proyecto completo:
-unos 5 segundos. Para saltárselo en un caso puntual, `git commit --no-verify`.
+`prepare`: en un clon recién hecho no hay hooks hasta que instalas. Corre, en
+este orden, formato y lint sobre lo indexado, el typecheck del proyecto
+completo y las pruebas unitarias: unos 11 segundos. Los E2E se quedan fuera
+porque levantan un servidor y tardan demasiado para cada commit. Para
+saltárselo en un caso puntual, `git commit --no-verify`.
 
 No se usa `eslint-config-prettier` a propósito: la configuración de ESLint de
 este repo activa 87 reglas y ninguna es de formato, así que no habría nada que
@@ -107,11 +109,21 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ## Dominio
 
 Las URLs absolutas (canonical, sitemap, Open Graph) salen de `src/lib/site.ts`.
-En Vercel se resuelven solas; con dominio propio hay que definir:
+
+**En Vercel no hay que configurar nada, ni siquiera con dominio propio.**
+`VERCEL_PROJECT_PRODUCTION_URL` devuelve el dominio de producción más corto del
+proyecto, y pasa a ser el tuyo en cuanto lo asignas.
+
+En cualquier otro host hay que definirlo a mano:
 
 ```bash
 NEXT_PUBLIC_SITE_URL=https://tu-dominio.com
 ```
+
+Si un despliegue de Vercel no logra resolver la URL, **el build falla** en vez
+de publicar el sitemap y el canonical apuntando a `localhost`. La causa
+habitual es tener desactivado «Enable access to System Environment Variables»
+en los ajustes del proyecto.
 
 ## Stack
 
