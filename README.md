@@ -16,13 +16,13 @@ pnpm dev         # http://localhost:3000
 
 ## Scripts
 
-| Script           | Qué hace                                        |
-| ---------------- | ----------------------------------------------- |
-| `pnpm dev`       | Servidor de desarrollo con Turbopack            |
-| `pnpm build`     | Build de producción                             |
-| `pnpm start`     | Sirve el build                                  |
-| `pnpm lint`      | ESLint                                          |
-| `pnpm typecheck` | `tsc --noEmit`                                  |
+| Script           | Qué hace                             |
+| ---------------- | ------------------------------------ |
+| `pnpm dev`       | Servidor de desarrollo con Turbopack |
+| `pnpm build`     | Build de producción                  |
+| `pnpm start`     | Sirve el build                       |
+| `pnpm lint`      | ESLint                               |
+| `pnpm typecheck` | `tsc --noEmit`                       |
 
 ## Estructura
 

@@ -112,8 +112,7 @@ export const resumeData = {
     },
     {
       title: "Full-Stack Engineer & Equipo Fundador",
-      company:
-        "Clikalia — Plataforma Proptech (respaldada por Scotiabank)",
+      company: "Clikalia — Plataforma Proptech (respaldada por Scotiabank)",
       location: "CDMX / Madrid, España",
       period: "Sep 2021 – Sep 2023",
       items: [
@@ -141,8 +140,7 @@ export const resumeData = {
     },
     {
       title: "Desarrollador Backend (.NET)",
-      company:
-        "SmartByte — Consultoría de Software (Cliente: PwC México)",
+      company: "SmartByte — Consultoría de Software (Cliente: PwC México)",
       location: "Ciudad de México",
       period: "Sep 2018 – Sep 2021",
       items: [
@@ -162,8 +160,7 @@ export const resumeData = {
     },
     {
       title: "Analista de Software",
-      company:
-        "SONDA — Consultoría TI (Cliente: Palacio de Hierro)",
+      company: "SONDA — Consultoría TI (Cliente: Palacio de Hierro)",
       location: "Ciudad de México",
       period: "Sep 2017 – Sep 2018",
       items: [

@@ -34,7 +34,7 @@ const principles = [
 function SectionHeading({ title }: { title: string }) {
   return (
     <div className="mb-5">
-      <h2 className="font-heading text-xl font-bold uppercase tracking-widest text-foreground">
+      <h2 className="font-heading text-xl font-bold tracking-widest text-foreground uppercase">
         {title}
       </h2>
       <Separator className="mt-2" />
@@ -120,7 +120,7 @@ export default function Home() {
       </div>
 
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col lg:flex-row">
-        <aside className="flex flex-col items-center gap-5 border-r border-border bg-card px-8 py-9 lg:w-87.5 lg:shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+        <aside className="flex flex-col items-center gap-5 border-r border-border bg-card px-8 py-9 lg:sticky lg:top-0 lg:h-screen lg:w-87.5 lg:shrink-0 lg:overflow-y-auto">
           <ProfileVideo poster={profileDarkImagePath} />
 
           <div className="w-full">
@@ -188,7 +188,7 @@ export default function Home() {
 
         <main className="flex-1 px-8 py-10 lg:px-14">
           <div className="mb-10">
-            <h1 className="font-heading uppercase tracking-wide text-foreground">
+            <h1 className="font-heading tracking-wide text-foreground uppercase">
               <span className="block text-5xl font-light lg:text-6xl">
                 {data.name}
               </span>
@@ -196,7 +196,7 @@ export default function Home() {
                 {data.lastName}
               </span>
             </h1>
-            <p className="mt-2 text-xl lowercase text-muted-foreground">
+            <p className="mt-2 text-xl text-muted-foreground lowercase">
               {data.title.toLowerCase()}
             </p>
           </div>
@@ -216,7 +216,7 @@ export default function Home() {
                   <h3 className="font-heading text-base font-bold text-foreground">
                     {exp.title}
                   </h3>
-                  <p className="mt-0.5 text-sm italic text-muted-foreground">
+                  <p className="mt-0.5 text-sm text-muted-foreground italic">
                     {exp.company} | {exp.location}
                   </p>
                   <p className="mt-0.5 text-sm text-muted-foreground">
@@ -252,7 +252,7 @@ export default function Home() {
                     {edu.degree}
                   </h3>
                   {edu.date && (
-                    <p className="text-sm italic text-muted-foreground">
+                    <p className="text-sm text-muted-foreground italic">
                       {edu.date}
                     </p>
                   )}

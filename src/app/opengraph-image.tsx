@@ -25,82 +25,80 @@ export default async function Image() {
   const focus = ["Fintech", "Proptech", "Blockchain"];
 
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          background: "#0b1120",
-          padding: "72px 80px",
-          fontFamily: "Montserrat",
-          color: "#e2e8f0",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div
-            style={{
-              fontSize: 26,
-              letterSpacing: 6,
-              textTransform: "uppercase",
-              color: "#94a3b8",
-            }}
-          >
-            Curriculum
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              marginTop: 28,
-              fontFamily: "Playfair Display",
-              lineHeight: 1.02,
-              textTransform: "uppercase",
-            }}
-          >
-            <span style={{ fontSize: 78, color: "#e2e8f0" }}>
-              {resumeData.name}
-            </span>
-            <span style={{ fontSize: 104, color: "#ffffff" }}>
-              {resumeData.lastName}
-            </span>
-          </div>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        background: "#0b1120",
+        padding: "72px 80px",
+        fontFamily: "Montserrat",
+        color: "#e2e8f0",
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <div
+          style={{
+            fontSize: 26,
+            letterSpacing: 6,
+            textTransform: "uppercase",
+            color: "#94a3b8",
+          }}
+        >
+          Curriculum
         </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginTop: 28,
+            fontFamily: "Playfair Display",
+            lineHeight: 1.02,
+            textTransform: "uppercase",
+          }}
+        >
+          <span style={{ fontSize: 78, color: "#e2e8f0" }}>
+            {resumeData.name}
+          </span>
+          <span style={{ fontSize: 104, color: "#ffffff" }}>
+            {resumeData.lastName}
+          </span>
+        </div>
+      </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
-          <div style={{ display: "flex", height: 3, background: "#1e293b" }} />
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span style={{ fontSize: 32, color: "#e2e8f0" }}>
-              Senior Full-Stack Engineer
-            </span>
-            <div style={{ display: "flex", gap: 14 }}>
-              {focus.map((item) => (
-                <span
-                  key={item}
-                  style={{
-                    fontSize: 24,
-                    color: "#94a3b8",
-                    border: "1px solid #1e293b",
-                    borderRadius: 999,
-                    padding: "8px 22px",
-                  }}
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
+        <div style={{ display: "flex", height: 3, background: "#1e293b" }} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <span style={{ fontSize: 32, color: "#e2e8f0" }}>
+            Senior Full-Stack Engineer
+          </span>
+          <div style={{ display: "flex", gap: 14 }}>
+            {focus.map((item) => (
+              <span
+                key={item}
+                style={{
+                  fontSize: 24,
+                  color: "#94a3b8",
+                  border: "1px solid #1e293b",
+                  borderRadius: 999,
+                  padding: "8px 22px",
+                }}
+              >
+                {item}
+              </span>
+            ))}
           </div>
         </div>
       </div>
-    ),
+    </div>,
     {
       ...size,
       fonts: [

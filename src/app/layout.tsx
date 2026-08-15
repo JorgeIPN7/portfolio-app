@@ -2,12 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider";
 import { resumeData } from "@/data/resume-data";
-import {
-  siteDescription,
-  siteName,
-  siteTitle,
-  siteUrl,
-} from "@/lib/site";
+import { siteDescription, siteName, siteTitle, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const montserrat = localFont({

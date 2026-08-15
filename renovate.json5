@@ -52,27 +52,23 @@
     {
       matchPackageNames: ["eslint"],
       allowedVersions: "<10",
-      description:
-        "ESLint 10 rompe el lint: eslint-plugin-react@7.37.5, que entra por eslint-config-next, declara ESLint ^9 como maximo y llama a una API retirada (contextOrFilename.getFilename is not a function). Levantar cuando los plugins de eslint-config-next declaren ^10.",
+      description: "ESLint 10 rompe el lint: eslint-plugin-react@7.37.5, que entra por eslint-config-next, declara ESLint ^9 como maximo y llama a una API retirada (contextOrFilename.getFilename is not a function). Levantar cuando los plugins de eslint-config-next declaren ^10.",
     },
     {
       matchPackageNames: ["typescript"],
       allowedVersions: "<6",
-      description:
-        "TypeScript 7 rompe el lint: typescript-eslint@8 declara typescript >=4.8.4 <6.1.0 y su parser falla al cargar (Cannot read properties of undefined (reading 'Cjs')). tsc si compila. Levantar cuando typescript-eslint publique soporte para TS 7.",
+      description: "TypeScript 7 rompe el lint: typescript-eslint@8 declara typescript >=4.8.4 <6.1.0 y su parser falla al cargar (Cannot read properties of undefined (reading 'Cjs')). tsc si compila. Levantar cuando typescript-eslint publique soporte para TS 7.",
     },
     {
       matchPackageNames: ["@types/node"],
       allowedVersions: "<23",
-      description:
-        "@types/node sigue la linea de Node, no la ultima publicada. El proyecto corre en Node 22 (.nvmrc y engines), asi que los tipos se quedan en 22.x.",
+      description: "@types/node sigue la linea de Node, no la ultima publicada. El proyecto corre en Node 22 (.nvmrc y engines), asi que los tipos se quedan en 22.x.",
     },
     {
       matchDatasources: ["node-version", "docker"],
       matchPackageNames: ["node"],
       allowedVersions: "<23",
-      description:
-        "Node fijado a la linea 22 LTS (Jod) en .nvmrc, engines y cualquier imagen. Cambiar de linea es una decision, no una actualizacion.",
+      description: "Node fijado a la linea 22 LTS (Jod) en .nvmrc, engines y cualquier imagen. Cambiar de linea es una decision, no una actualizacion.",
     },
   ],
 }
