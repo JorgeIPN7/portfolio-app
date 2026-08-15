@@ -49,4 +49,6 @@ function Badge({
   });
 }
 
-export { Badge, badgeVariants };
+// `badgeVariants` no se exporta: solo lo usa este archivo. Si algún día hace
+// falta fuera, vuelve a la lista.
+export { Badge };

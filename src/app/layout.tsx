@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider";
 import { resumeData } from "@/data/resume-data";
 import { siteDescription, siteName, siteTitle, siteUrl } from "@/lib/site";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
 const montserrat = localFont({
@@ -106,8 +107,13 @@ export const viewport: Viewport = {
  * El oscuro es el estado por defecto de la página, así que solo un "light"
  * guardado explícitamente lo desactiva. Si localStorage no está disponible,
  * también gana el oscuro.
+ *
+ * La clave viene de `@/lib/theme`, que no lleva `"use client"`: importarla del
+ * proveedor de tema la dejaría en `undefined` aquí, y el build no se quejaría.
  */
-const themeScript = `(function(){try{if(localStorage.getItem("theme")!=="light")document.documentElement.classList.add("dark")}catch(e){document.documentElement.classList.add("dark")}})();`;
+const themeScript = `(function(){try{if(localStorage.getItem(${JSON.stringify(
+  THEME_STORAGE_KEY,
+)})!=="light")document.documentElement.classList.add("dark")}catch(e){document.documentElement.classList.add("dark")}})();`;
 
 export default function RootLayout({
   children,

@@ -7,11 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-
-export type Theme = "dark" | "light";
-
-/** Clave de localStorage. La comparte el script antiparpadeo de `layout.tsx`. */
-export const THEME_STORAGE_KEY = "theme";
+import { THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
 
 type ThemeContextValue = {
   theme: Theme;
