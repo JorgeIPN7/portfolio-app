@@ -1,0 +1,16 @@
+# Generados por el toolchain
+pnpm-lock.yaml
+next-env.d.ts
+*.tsbuildinfo
+.next/
+out/
+build/
+
+# Salida de Playwright
+test-results/
+playwright-report/
+blob-report/
+
+# Lo reescribe `next dev` en cada arranque: formatearlo produce un diff que
+# Next revierte al siguiente arranque.
+AGENTS.md
