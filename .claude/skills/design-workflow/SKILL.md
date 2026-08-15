@@ -1,6 +1,6 @@
 ---
 name: design-workflow
-description: Use before any UI, design, styling, Tailwind, component, layout, animation, theme, accessibility or metadata work in this repo (portfolio-app, Next.js 16). Routes the task to the installed design skills (impeccable, baseline-ui, fixing-accessibility, fixing-motion-performance, fixing-metadata, animate, review-animations, pick-ui-library), states which one wins when two disagree, and lists the project rules (motion v13, Tailwind 4 CSS-first, shadcn on Base UI, next-intl, dark-first) that no third-party skill may override. Not for backend, data or content-only edits.
+description: Use before any UI, design, styling, Tailwind, component, layout, animation, theme, accessibility, metadata, React/Next performance or deploy work in this repo (portfolio-app, Next.js 16 on Vercel). Routes the task to the installed skills (impeccable, baseline-ui, fixing-accessibility, fixing-motion-performance, fixing-metadata, animate, review-animations, pick-ui-library, vercel-react-best-practices, vercel-composition-patterns, vercel-react-view-transitions, web-design-guidelines, deploy-to-vercel), states which one wins when two disagree, and lists the project rules (motion v13, Tailwind 4 CSS-first, shadcn on Base UI, next-intl, dark-first) that no third-party skill may override. Not for backend, data or content-only edits.
 argument-hint: "[tarea de UI a enrutar]"
 ---
 
@@ -40,7 +40,12 @@ vendor (se actualizan desde su origen); las reglas locales viven aquí, en
 | Elegir librería (toasts, command menu, charts, dnd, estado…) | `/pick-ui-library` (manual) | Ya elegido aquí: Base UI, `motion`, next-themes, lucide, `cn` |
 | Textos de interfaz (microcopy, errores, vacíos) | `/impeccable clarify` | El texto resultante va a `messages/*.json` en **los dos idiomas** |
 | Robustez: textos largos (inglés/español), overflow, estados de error | `/impeccable harden` | Probar con el idioma más largo |
-| Rendimiento (CWV, imágenes, fuentes, JS) | `/impeccable optimize` + `fixing-motion-performance` | Medir antes y después |
+| Rendimiento visual (CWV, imágenes, fuentes, animación) | `/impeccable optimize` + `fixing-motion-performance` | Medir antes y después |
+| Rendimiento React/Next: waterfalls, bundle, RSC, data fetching, re-renders, Suspense | `vercel-react-best-practices` (72 reglas de Vercel Engineering, por impacto) | Autoridad en código React/RSC; impeccable `optimize` se queda en la capa visual. Cargar solo las reglas de la categoría que toque (`rules/`). Dos reglas suyas no aplican tal cual en Next 16.3: `dynamic(..., { ssr: false })` no está permitido en Server Components (solo en `"use client"`), y `optimizePackageImports` para `lucide-react` ya viene por defecto. Para `use cache` / Cache Components manda la doc local de Next |
+| Diseñar la API de un componente (props booleanas que se multiplican, compound components, context, `render`) | `vercel-composition-patterns` | Encaja con Base UI (composición por `render`) y con React 19 |
+| Transición de ruta o de estado (CV ↔ `/proyectos`, entrar/salir, elemento compartido, reordenar listas) | `vercel-react-view-transitions` (`<ViewTransition>`, `addTransitionType`, `transitionTypes` en `next/link`) | La doc local de Next 16.3 (`node_modules/next/dist/docs/01-app/02-guides/view-transitions.md`) recomienda esta skill: funciona **sin configuración** y **sin** instalar `react@canary` (el App Router ya lo trae); si su referencia pide `experimental.viewTransition`, ignóralo (el flag ya no existe). Estructura de Vercel; curvas y duraciones de Emil (`animate`) —sus recetas usan `ease-in` y `blur` en salidas: no—; revisar con `/review-animations`; rendimiento con `fixing-motion-performance` |
+| Segunda opinión de UI contra las Web Interface Guidelines de Vercel (93 reglas: a11y, foco, formularios, animación, tipografía, imágenes, i18n) | `web-design-guidelines <archivo o patrón>` | Descarga las reglas por red en cada uso (`raw.githubusercontent.com/vercel-labs/web-interface-guidelines`, sin plan B offline); salida terse `archivo:línea`. Úsala **después** de `/impeccable audit`, no en su lugar, y **omite su bloque de copy** (Title Case, comillas inglesas): el CV está en español |
+| Desplegar o crear una preview en Vercel | `/deploy-to-vercel` **solo por invocación manual del dueño** (está en `skillOverrides` como `user-invocable-only`) | Aquí desplegar es hacer push: Vercel construye desde Git. La skill puede intentar `git add . && git commit && git push` y, como último recurso, subir el proyecto a un endpoint externo: **prohibido**; solo `vercel deploy` de preview con la sesión iniciada, nunca `--prod` sin que se pida |
 | Documentar el sistema visual tras un cambio aceptado | Actualizar `DESIGN.md` a mano en el mismo commit, o `/impeccable document` para regenerarlo (+ sidecar `.impeccable/design.json`) | Validar con `npx @google/design.md lint DESIGN.md` (0 errores; los avisos de tokens "huérfanos" del tema oscuro son esperables) |
 | Iterar en el navegador con variantes | `/impeccable live` (`.impeccable/live/config.json` ya apunta a `src/app/[locale]/layout.tsx`) | Necesita `pnpm dev` levantado; opcional |
 | `bolder` / `quieter` / `overdrive` / `delight` | Solo si el dueño lo pide explícitamente | Este es un CV sobrio (ver PRODUCT.md); "más atrevido" no es una mejora por defecto |
@@ -72,9 +77,17 @@ Cuando varias encajen a la vez: **una** para diagnosticar (critique/audit/improv
    explicitly requested" prevalece salvo petición explícita.
 4. **Dirección estética**: impeccable (modo *Experience/Read* para un
    portfolio), siempre dentro de `DESIGN.md`. No hay skill de "gusto" que imponga
-   fuentes o paletas: taste-skill y UI/UX Pro Max se evaluaron y **no** se
-   instalaron (ver `docs/skills-de-diseno.md`).
-5. **Datos**: no hay base de datos de paletas/fuentes; los tokens salen de
+   fuentes o paletas: taste-skill, UI/UX Pro Max, `frontend-design` de Anthropic
+   y huashu-design se evaluaron y **no** se instalaron (ver
+   `docs/skills-de-diseno.md`; las dos últimas quedan documentadas para usarlas
+   bajo demanda en un proyecto nuevo, nunca autoactivadas aquí).
+5. **Código React/Next (datos, RSC, bundle, re-renders)**: manda
+   `vercel-react-best-practices`; `/impeccable optimize` y
+   `fixing-motion-performance` se quedan en lo visual. Si una receta de
+   `vercel-react-view-transitions` trae duraciones o curvas, se sustituyen por las
+   de Emil; si `web-design-guidelines` y `/impeccable audit` repiten un hallazgo,
+   cuenta una vez y lo arbitra `pnpm test:e2e` (axe).
+6. **Datos**: no hay base de datos de paletas/fuentes; los tokens salen de
    `globals.css` y se documentan en `DESIGN.md`.
 
 ## 4. Reglas del proyecto que ninguna skill puede pisar (Next.js 16)
@@ -108,6 +121,15 @@ Cuando varias encajen a la vez: **una** para diagnosticar (critique/audit/improv
   API (`generateMetadata`, `alternatesFor`, `sitemap.ts`, `robots.ts`,
   `opengraph-image.tsx`); fuentes por `next/font/local` (nunca `<link>` a Google
   Fonts). Documentación de la versión instalada en `node_modules/next/dist/docs/`.
+  Para `<ViewTransition>` no se instala `react@canary` ni se toca
+  `next.config.ts` (Next 16.3 lo trae sin configuración).
+- **Vercel**: el sitio se construye desde Git (integración de Vercel); no se
+  hace push ni deploy sin permiso explícito del dueño. `deploy-to-vercel` es
+  solo manual (`/deploy-to-vercel`), para previews, y nunca commitea, hace push
+  ni sube el proyecto a terceros. `vercel-optimize` (auditoría de coste con
+  métricas reales) no está instalada: exige proyecto enlazado, Observability
+  Plus y tráfico; tiene sentido en la e-shop, no aquí. Las variables de entorno
+  se validan en `src/env.ts` (ver README).
 - **Idiomas**: todo texto nuevo en `messages/es.json` **y** `messages/en.json` (o
   en ambos `resume-data`); las pruebas unitarias comprueban la paridad. La raya
   (—) y las comillas «» son correctas en español.
@@ -125,10 +147,12 @@ Cuando varias encajen a la vez: **una** para diagnosticar (critique/audit/improv
    el componente afectado.
 2. Diagnóstico si hace falta: `/impeccable critique` o `/impeccable audit` sobre
    la superficie; anotar qué se va a cambiar y qué no.
-3. Implementar bajo `baseline-ui`; movimiento con `animate`; textos en los dos
-   `messages/*.json`.
+3. Implementar bajo `baseline-ui`; movimiento con `animate` (o
+   `vercel-react-view-transitions` si es una transición de ruta); datos y RSC
+   según `vercel-react-best-practices`; textos en los dos `messages/*.json`.
 4. Revisar: `/review-animations` si hubo movimiento; `fixing-accessibility` /
-   `fixing-metadata` si tocó formularios, controles o `<head>`; leer los avisos
+   `fixing-metadata` si tocó formularios, controles o `<head>`;
+   `web-design-guidelines <archivo>` como segunda opinión terse; leer los avisos
    del hook de impeccable del turno.
 5. Verificar: `pnpm lint && pnpm typecheck && pnpm test`; abrir la página con el
    MCP de Playwright en claro y oscuro (y `/en`); `pnpm test:e2e` si tocó
