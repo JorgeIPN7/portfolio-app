@@ -7,8 +7,6 @@ import { useTheme } from "@/components/theme-provider";
 import {
   Mail,
   MapPin,
-  Linkedin,
-  Github,
   Sun,
   Moon,
   Download,
@@ -19,6 +17,7 @@ import {
   Zap,
   TrendingUp,
 } from "lucide-react";
+import { GithubIcon, LinkedinIcon } from "@/components/icons/brand-icons";
 import { useRef, useEffect, useCallback } from "react";
 
 function SectionHeading({ title }: { title: string }) {
@@ -173,7 +172,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Linkedin size={16} className="shrink-0" />
+                <LinkedinIcon size={16} className="shrink-0" />
                 <span className="truncate">{data.contact.linkedin.label}</span>
               </a>
               <a
@@ -182,7 +181,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Github size={16} className="shrink-0" />
+                <GithubIcon size={16} className="shrink-0" />
                 <span className="truncate">{data.contact.github.label}</span>
               </a>
             </div>
