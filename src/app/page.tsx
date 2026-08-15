@@ -1,14 +1,19 @@
-"use client";
-
 import { resumeData } from "@/data/resume-data";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useTheme } from "@/components/theme-provider";
+import { GithubIcon, LinkedinIcon } from "@/components/icons/brand-icons";
+import { ProfileVideo } from "@/components/profile-video";
+import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  cvPdfPath,
+  profileDarkImagePath,
+  profileImagePath,
+  siteName,
+  siteUrl,
+} from "@/lib/site";
 import {
   Mail,
   MapPin,
-  Sun,
-  Moon,
   Download,
   Phone,
   Brain,
@@ -17,8 +22,14 @@ import {
   Zap,
   TrendingUp,
 } from "lucide-react";
-import { GithubIcon, LinkedinIcon } from "@/components/icons/brand-icons";
-import { useRef, useEffect, useCallback } from "react";
+
+const principles = [
+  { Icon: Brain, text: "Controla tus pensamientos antes que tus actos" },
+  { Icon: Eye, text: "Cumple tus promesas, aunque nadie mire" },
+  { Icon: Dumbbell, text: "Entrena la mente como entrenas el cuerpo" },
+  { Icon: Zap, text: "Aprende a comenzar aunque no tengas ganas" },
+  { Icon: TrendingUp, text: "Termina lo que empiezas, aunque duela" },
+];
 
 function SectionHeading({ title }: { title: string }) {
   return (
@@ -59,87 +70,59 @@ function SkillCategory({
 }
 
 export default function Home() {
-  const { theme, toggleTheme } = useTheme();
   const data = resumeData;
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const prevThemeRef = useRef(theme);
-  const rafRef = useRef<number | null>(null);
 
-  const playReverse = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-
-    const step = () => {
-      if (!video) return;
-      if (video.currentTime <= 0.05) {
-        video.currentTime = 0;
-        return;
-      }
-      video.currentTime = Math.max(0, video.currentTime - 0.04);
-      rafRef.current = requestAnimationFrame(step);
-    };
-    rafRef.current = requestAnimationFrame(step);
-  }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (prevThemeRef.current !== theme) {
-      if (theme === "dark") {
-        // Play forward: removing sunglasses
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        video.currentTime = 0;
-        video.play();
-      } else {
-        // Play reverse: putting sunglasses back on
-        video.pause();
-        playReverse();
-      }
-      prevThemeRef.current = theme;
-    }
-  }, [theme, playReverse]);
+  // Datos estructurados para buscadores y asistentes. Se escapa `<` según
+  // recomienda la guía de JSON-LD de Next.
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: siteName,
+    jobTitle: data.title,
+    description: data.profile,
+    url: siteUrl,
+    image: `${siteUrl}${profileImagePath}`,
+    email: `mailto:${data.contact.email}`,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: data.contact.location,
+      addressCountry: "MX",
+    },
+    sameAs: [data.contact.linkedin.url, data.contact.github.url],
+    alumniOf: data.education.map((edu) => ({
+      "@type": "CollegeOrUniversity",
+      name: edu.institution,
+    })),
+    knowsLanguage: data.languages.map((lang) => lang.language),
+    knowsAbout: Object.values(data.technicalSkills).flat(),
+  };
 
   return (
     <div className="relative min-h-screen bg-background">
-      {/* Top actions - top right like original */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+
+      {/* Acciones fijas, arriba a la derecha */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
-        <button
-          onClick={toggleTheme}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 text-muted-foreground backdrop-blur transition-colors hover:bg-accent"
-          aria-label="toggle dark mode"
-        >
-          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
+        <ThemeToggle />
         <a
-          href="/cv_fullstack_jorge_herminio_lopez_vazquez.pdf"
+          href={cvPdfPath}
           download
           className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 text-muted-foreground backdrop-blur transition-colors hover:bg-accent"
           aria-label="Descargar CV en PDF"
         >
-          <Download size={18} />
+          <Download size={18} aria-hidden="true" />
         </a>
       </div>
 
-      {/* Main layout */}
       <div className="mx-auto flex min-h-screen max-w-6xl flex-col lg:flex-row">
-        {/* Sidebar */}
         <aside className="flex flex-col items-center gap-5 border-r border-border bg-card px-8 py-9 lg:w-87.5 lg:shrink-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
-          {/* Profile video - plays on theme toggle */}
-          <div className="relative h-56 w-56 overflow-hidden rounded-full border-2 border-border lg:h-64 lg:w-64">
-            <video
-              ref={videoRef}
-              src="/profile-video.mp4"
-              muted
-              playsInline
-              preload="auto"
-              poster="/profile.jpeg"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          </div>
+          <ProfileVideo poster={profileDarkImagePath} />
 
-          {/* Contact section */}
           <div className="w-full">
             <SectionHeading title="contacto" />
             <div className="flex flex-col gap-3">
@@ -147,7 +130,7 @@ export default function Home() {
                 href={`mailto:${data.contact.email}`}
                 className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Mail size={16} className="shrink-0" />
+                <Mail size={16} className="shrink-0" aria-hidden="true" />
                 <span className="truncate">{data.contact.email}</span>
               </a>
               <a
@@ -156,14 +139,14 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Phone size={16} className="shrink-0" />
+                <Phone size={16} className="shrink-0" aria-hidden="true" />
                 <span className="truncate">
                   {data.contact.phone.label}{" "}
                   <span className="text-xs">({data.contact.phone.note})</span>
                 </span>
               </a>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <MapPin size={16} className="shrink-0" />
+                <MapPin size={16} className="shrink-0" aria-hidden="true" />
                 <span>{data.contact.location}</span>
               </div>
               <a
@@ -187,49 +170,37 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Principios */}
           <div className="w-full rounded-lg border border-border bg-background/50 px-3 py-2">
             <ul className="flex flex-col gap-1 text-xs leading-snug text-muted-foreground">
-              <li className="flex items-center gap-1.5">
-                <Brain size={12} className="shrink-0 text-foreground" />
-                <span>Controla tus pensamientos antes que tus actos</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Eye size={12} className="shrink-0 text-foreground" />
-                <span>Cumple tus promesas, aunque nadie mire</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Dumbbell size={12} className="shrink-0 text-foreground" />
-                <span>Entrena la mente como entrenas el cuerpo</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Zap size={12} className="shrink-0 text-foreground" />
-                <span>Aprende a comenzar aunque no tengas ganas</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <TrendingUp size={12} className="shrink-0 text-foreground" />
-                <span>Termina lo que empiezas, aunque duela</span>
-              </li>
+              {principles.map(({ Icon, text }) => (
+                <li key={text} className="flex items-center gap-1.5">
+                  <Icon
+                    size={12}
+                    className="shrink-0 text-foreground"
+                    aria-hidden="true"
+                  />
+                  <span>{text}</span>
+                </li>
+              ))}
             </ul>
           </div>
         </aside>
 
-        {/* Main content */}
         <main className="flex-1 px-8 py-10 lg:px-14">
-          {/* Name */}
           <div className="mb-10">
-            <h1 className="font-heading text-5xl font-light uppercase tracking-wide text-foreground lg:text-6xl">
-              {data.name}
+            <h1 className="font-heading uppercase tracking-wide text-foreground">
+              <span className="block text-5xl font-light lg:text-6xl">
+                {data.name}
+              </span>
+              <span className="block text-5xl font-bold lg:text-7xl">
+                {data.lastName}
+              </span>
             </h1>
-            <h1 className="font-heading text-5xl font-bold uppercase tracking-wide text-foreground lg:text-7xl">
-              {data.lastName}
-            </h1>
-            <p className="mt-2 text-xl text-muted-foreground lowercase">
+            <p className="mt-2 text-xl lowercase text-muted-foreground">
               {data.title.toLowerCase()}
             </p>
           </div>
 
-          {/* Perfil Profesional */}
           <section className="mb-10">
             <SectionHeading title="perfil profesional" />
             <p className="text-base leading-relaxed text-foreground">
@@ -237,12 +208,11 @@ export default function Home() {
             </p>
           </section>
 
-          {/* Experiencia Profesional */}
           <section className="mb-10">
             <SectionHeading title="experiencia profesional" />
             <div className="flex flex-col gap-8">
-              {data.experience.map((exp, i) => (
-                <div key={i}>
+              {data.experience.map((exp) => (
+                <div key={`${exp.company}-${exp.period}`}>
                   <h3 className="font-heading text-base font-bold text-foreground">
                     {exp.title}
                   </h3>
@@ -253,8 +223,8 @@ export default function Home() {
                     {exp.period}
                   </p>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                    {exp.items.map((item, j) => (
-                      <li key={j}>
+                    {exp.items.map((item) => (
+                      <li key={item.text}>
                         {item.label ? (
                           <>
                             <span className="font-semibold text-foreground">
@@ -273,12 +243,11 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Formación Académica */}
           <section className="mb-10">
             <SectionHeading title="formación académica" />
             <div className="flex flex-col gap-5">
-              {data.education.map((edu, i) => (
-                <div key={i}>
+              {data.education.map((edu) => (
+                <div key={`${edu.degree}-${edu.institution}`}>
                   <h3 className="font-heading text-base font-bold text-foreground">
                     {edu.degree}
                   </h3>
@@ -295,7 +264,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Desarrollo Profesional Continuo */}
           <section className="mb-10">
             <SectionHeading title="desarrollo profesional continuo" />
             <p className="text-base leading-relaxed text-foreground">
@@ -303,7 +271,6 @@ export default function Home() {
             </p>
           </section>
 
-          {/* Habilidades Técnicas */}
           <section className="mb-10">
             <SectionHeading title="habilidades técnicas" />
             {Object.entries(data.technicalSkills).map(([cat, skills]) => (
@@ -311,7 +278,6 @@ export default function Home() {
             ))}
           </section>
 
-          {/* Habilidades Blandas */}
           <section className="mb-10">
             <SectionHeading title="habilidades blandas" />
             {Object.entries(data.softSkills).map(([cat, skills]) => (
@@ -319,7 +285,6 @@ export default function Home() {
             ))}
           </section>
 
-          {/* Idiomas */}
           <section className="mb-10">
             <SectionHeading title="idiomas" />
             <div className="grid grid-cols-2 gap-6">
@@ -334,13 +299,11 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Intereses */}
           <section className="mb-10">
             <SectionHeading title="intereses" />
             <p className="text-sm text-muted-foreground">{data.hobbies}</p>
           </section>
 
-          {/* Footer */}
           <footer className="mt-12 border-t border-border pt-6 text-center text-xs text-muted-foreground">
             <p>{data.footer.privacyNotice}</p>
             <p className="mt-2">

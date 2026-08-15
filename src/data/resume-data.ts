@@ -1,3 +1,62 @@
+export type ResumeLink = {
+  label: string;
+  url: string;
+};
+
+export type ExperienceItem = {
+  /** Encabezado en negrita del punto. Vacío u omitido lo deja como texto corrido. */
+  label?: string;
+  text: string;
+};
+
+export type Experience = {
+  title: string;
+  company: string;
+  location: string;
+  period: string;
+  items: ExperienceItem[];
+};
+
+export type Education = {
+  degree: string;
+  date?: string;
+  institution: string;
+};
+
+export type Language = {
+  language: string;
+  level: string;
+};
+
+/** Categoría visible → lista de habilidades. */
+export type SkillGroups = Record<string, string[]>;
+
+export type ResumeData = {
+  name: string;
+  lastName: string;
+  title: string;
+  profile: string;
+  contact: {
+    email: string;
+    phone: { label: string; url: string; note: string };
+    location: string;
+    linkedin: ResumeLink;
+    github: ResumeLink;
+  };
+  experience: Experience[];
+  education: Education[];
+  continuousLearning: string;
+  technicalSkills: SkillGroups;
+  softSkills: SkillGroups;
+  languages: Language[];
+  hobbies: string;
+  quote: string;
+  footer: {
+    privacyNotice: string;
+    lastUpdated: string;
+  };
+};
+
 export const resumeData = {
   name: "Jorge Herminio",
   lastName: "López Vázquez",
@@ -217,4 +276,4 @@ export const resumeData = {
       "Autorizo el tratamiento de mis datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) de México.",
     lastUpdated: "Marzo 2026",
   },
-};
+} satisfies ResumeData;
