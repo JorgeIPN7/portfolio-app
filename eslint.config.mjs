@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Skills de terceros para agentes: código vendor que se actualiza desde su
+    // origen, no se lintea aquí (ver .prettierignore).
+    ".claude/skills/**",
   ]),
 ]);
 
